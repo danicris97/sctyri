@@ -104,7 +104,7 @@ class DependencyController extends Controller
             }
 
             return redirect()
-                ->route('admin.entities.dependencies.index')
+                ->route('entities.dependencies.index')
                 ->with('toast', [
                     'type' => 'success',
                     'message' => 'Dependencia creada correctamente'
@@ -170,7 +170,7 @@ class DependencyController extends Controller
 
             $dependency->update($validated);
             
-            return redirect()->route('admin.entities.dependencies.index')
+            return redirect()->route('entities.dependencies.index')
                 ->with('toast', ['type' => 'success', 'message' => 'Dependencia actualizada con éxito.']);
         } catch (\Exception $e) {
             
@@ -185,7 +185,7 @@ class DependencyController extends Controller
     {
         try {
             $dependency->delete();
-            return redirect()->route('admin.entities.dependencies.index')
+            return redirect()->route('entities.dependencies.index')
                 ->with('toast', ['type' => 'success', 'message' => 'Dependencia eliminada con éxito.']);
         } catch (\Exception $e) {
             return redirect()->back()->with('toast', ['type' => 'error', 'message' => 'Error al eliminar la Dependencia: ' . $e->getMessage()]);

@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Support\Carbon;
 use App\Enums\{
     AgreementEnum,
-    AgreementRenewalEnum
+    AgreementRenewalEnum,
+    AgreementStatusEnum
 };
 
 class Agreement extends Model
@@ -42,6 +43,7 @@ class Agreement extends Model
         'duration' => 'integer',
         'type' => AgreementEnum::class,
         'type_renewal' => AgreementRenewalEnum::class,
+        'status' => AgreementStatusEnum::class,
     ];
 
     protected $appends = [
@@ -51,6 +53,68 @@ class Agreement extends Model
         'formated_date_end',
         'formated_date_renewal',
     ];
+    /**
+     * Metodos para el estado y booted
+     */
+
+    public function refreshStatus(): void
+    {
+        $today = now();
+
+        $isCancelled = $this->cancellations()
+            ->exists();
+
+        if ($isCancelled) {
+            $this->status = AgreementStatusEnum::Cancelado;
+            return;
+        }
+
+        $vigenciaHasta = $this->date_renewal ?? $this->date_end;
+
+        if (!$vigenciaHasta) {
+            $this->status = AgreementStatusEnum::Activo;
+            return;
+        }
+
+        if ($today->greaterThan($vigenciaHasta)) {
+            $this->status = AgreementStatusEnum::Vencido;
+            return;
+        }
+
+        $diffDias = $today->diffInDays($vigenciaHasta, false); 
+
+        if ($diffDias <= 30) {
+            $this->status = AgreementStatusEnum::Proximo_a_vencer;
+            return;
+        }
+
+        if ($this->date_renewal && $this->date_renewal->greaterThan($this->date_end)) {
+            $this->status = AgreementStatusEnum::Renovado;
+            return;
+        }
+
+        $this->status = AgreementStatusEnum::Activo;
+    }
+
+    public function syncStatus(): void
+    {
+        $this->refreshDerivedDates();
+        $this->refreshStatus();
+        $this->save();
+    }
+
+    public function refreshDerivedDates(): void
+    {
+        if ($this->date_signature && $this->duration) {
+            $this->date_end = $this->date_signature->copy()->addMonths($this->duration);
+        }
+
+        $lastRenewal = $this->agreementRenewals()
+            ->latest('date_end')
+            ->first();
+
+        $this->date_renewal = $lastRenewal?->date_end ?? $this->date_end;
+    }
 
     /**
      * Auto save para guardar calcular fecha fin y fecha de renovacion
@@ -59,34 +123,8 @@ class Agreement extends Model
     protected static function booted()
     {
         static::saving(function ($agreement) {
-            //calcular fecha fin
-            if ($agreement->date_signature && $agreement->duration) {
-                $agreement->date_end = $agreement->date_signature->copy()->addMonths($agreement->duration);
-            }
-            //calcular fecha_renovacion_vigente
-            $lastRenewal = $agreement->agreementRenewals()->latest('date_end')->first();
-            $agreement->date_renewal = $lastRenewal?->date_end ?? $agreement->date_end;
-
-            //calcular estatus
-            $today = Carbon::now();
-
-            if($agreement->date_end){
-                if ($agreement->date_end < $today) {
-                    if ($agreement->date_end->diffInDays($today) <= 30) {
-                        $agreement->status = 'Próximo a vencer';
-                    }else{
-                        if ($agreement->date_renewal){
-                            if ($agreement->date_renewal < $today){
-                                $agreement->status = 'Renovado';
-                            }else{
-                                $agreement->status = 'Vencido';
-                            }
-                        }else{
-                            $agreement->status = 'Vencido';
-                        }
-                    }
-                }
-            }
+            $agreement->refreshDerivedDates();
+            $agreement->refreshStatus();
         });
     }
 
@@ -317,6 +355,7 @@ class Agreement extends Model
     /**
      * Métodos estáticos
      */
+
     //opcion para selects
     public static function getOptions()
     {
@@ -327,4 +366,26 @@ class Agreement extends Model
             ];
         });
     }
+
+    public static function getOptionsWithOutCancelled()
+    {
+        return self::where('status', '!=', AgreementStatusEnum::Cancelado)->get()->map(function ($agreement) {
+            return [
+                'value' => $agreement->id,
+                'label' => $agreement->name,
+            ];
+        });
+    }
+
+    public static function getOptionsRenewables()
+    {
+        return self::where('status', '!=', AgreementStatusEnum::Cancelado)
+                    ->where('type_renewal', '!=', AgreementRenewalTypeEnum::Partes_Iguales)->get()->map(function ($agreement) {
+            return [
+                'value' => $agreement->id,
+                'label' => $agreement->name,
+            ];
+        });
+    }
+
 }

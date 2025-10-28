@@ -51,7 +51,7 @@ class PersonPositionController extends Controller
         });
 
         return Inertia::render('admin/entities/person-position/index', [
-            'person_positions' => $personPositions,
+            'personPositions' => $personPositions,
             'search' => $search,
             'sort' => $sort,
             'direction' => $direction,
@@ -84,11 +84,11 @@ class PersonPositionController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'toast' => ['type' => 'success', 'message' => 'Persona con cargo creada correctamente'],
-                    'person_position' => $personPosition->load('person')->toArray(),
+                    'personPosition' => $personPosition->load('person')->toArray(),
                 ], 201);
             }
 
-            return redirect()->route('admin.person-position.index')
+            return redirect()->route('entities.person-position.index')
                 ->with('toast', ['type' => 'success', 'message' => 'Persona con cargo creada correctamente']);
         } catch (\Throwable $exception) {
             Log::error('Error al crear la Persona con cargo.', [
@@ -113,7 +113,7 @@ class PersonPositionController extends Controller
     public function show(PersonPosition $personPosition)
     {
         return Inertia::render('admin/person-position/show', [
-            'person_position' => $person_position,
+            'personPosition' => $personPosition,
         ]);
     }
 
@@ -123,7 +123,7 @@ class PersonPositionController extends Controller
     public function edit(PersonPosition $personPosition)
     {
         return Inertia::render('admin/person-position/edit', [
-            'person_position' => $person_position,
+            'personPosition' => $personPosition,
         ]);
     }
 
@@ -138,11 +138,11 @@ class PersonPositionController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'toast' => ['type' => 'success', 'message' => 'Persona con cargo actualizada correctamente'],
-                    'person_position' => $personPosition->load('person')->toArray(),
+                    'personPosition' => $personPosition->load('person')->toArray(),
                 ], 201);
             }
 
-            return redirect()->route('admin.person-position.index')
+            return redirect()->route('entities.person-position.index')
                 ->with('toast', ['type' => 'success', 'message' => 'Persona con cargo actualizada correctamente']);
         } catch (\Throwable $exception) {
             Log::error('Error al actualizar la Persona con cargo.', [
@@ -167,11 +167,11 @@ class PersonPositionController extends Controller
     public function destroy(PersonPosition $personPosition)
     {
         try {
-            $persona_rol->delete();
-            return redirect()->route('admin.person-position.index')
+            $personPosition->delete();
+            return redirect()->route('entities.person-position.index')
                 ->with('toast', ['type' => 'success', 'message' => 'Persona eliminada correctamente']);
         } catch (\Exception $e) {
-            return redirect()->route('admin.person-position.index')
+            return redirect()->route('entities.person-position.index')
                 ->with('toast', ['type' => 'error', 'message' => 'Error al eliminar el persona: ' . $e->getMessage()]);
         }
     }

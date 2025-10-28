@@ -33,6 +33,73 @@ class AgreementRenewal extends Model
     ];
 
     /**
+     * Scopes
+     */
+
+    public function scopeSearch($query, $search)
+    {
+        return $query->where(function ($builder) use ($search) {
+                $likeSearch = '%' . $search . '%';
+
+                $builder->where('start_date', 'like', $likeSearch)
+                    ->orWhere('duration', 'like', $likeSearch)
+                    ->orWhere('observations', 'like', $likeSearch)
+                    ->orWhere('end_date', 'like', $likeSearch)
+                    ->orWhereHas('agreement', function ($agreementQuery) use ($likeSearch) {
+                        $agreementQuery->where('summary', 'like', $likeSearch)
+                            ->orWhere('type', 'like', $likeSearch)
+                            ->orWhereHas('resolution.file', function ($fileQuery) use ($likeSearch) {
+                                $fileQuery->where('number', 'like', $likeSearch)
+                                    ->orWhere('year', 'like', $likeSearch);
+                            });
+                    })
+                    ->orWhereHas('resolution', function ($resolutionQuery) use ($likeSearch) {
+                        $resolutionQuery->where('number', 'like', $likeSearch)
+                            ->orWhere('type', 'like', $likeSearch);
+                    });
+            });
+    }
+
+    public function scopeFilter($query, $filters)
+    {
+        if ($filters['date_since'] && $filters['date_until']) {
+            $query->whereBetween('start_date', [$filters['date_since'], $filters['date_until']]);
+        } elseif ($filters['date_since']) {
+            $query->whereBetween('start_date', [$filters['date_since'], now()->toDateString()]);
+        } elseif ($filters['date_until']) {
+            $query->whereBetween('start_date', ['1900-01-01', $filters['date_until']]);
+        }
+
+        if ($filters['agreement_id']) {
+            $query->where('agreement_id', $filters['agreement_id']);
+        }
+
+        if ($filters['file_id']) {
+            $query->whereHas('file', function ($q) use ($filters) {
+                $q->where('id', $filters['file_id']);
+            });
+        }
+
+        if ($filters['institution_id']) {
+            $query->whereHas('agreement', function ($q) use ($filters) {
+                $q->where('institution_id', $filters['institution_id']);
+            });
+        }
+        
+        if ($filters['dependency_id']) {
+            $query->whereHas('agreement', function ($q) use ($filters) {
+                $q->where('dependency_id', $filters['dependency_id']);
+            });
+        }
+
+        if ($filters['type']) {
+            $query->whereHas('agreement', function ($q) use ($filters) {
+                $q->where('type', $filters['type']);
+            });
+        }
+    }
+
+    /**
      * Accessors
      */
     public function getFormatedStartDateAttribute(): ?string

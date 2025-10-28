@@ -129,7 +129,7 @@ class InstitutionController extends Controller
 
             $institution = Institution::create($validated);
 
-            return redirect()->route('admin.entities.institutions.index')
+            return redirect()->route('entities.institutions.index')
                 ->with('toast', ['type' => 'success', 'message' => 'Institución creada con éxito.']);
         } catch (\Exception $e) {
             return redirect()->back()->with('toast', ['type' => 'error', 'message' => 'Error al crear la institución: ' . $e->getMessage()]);
@@ -192,7 +192,7 @@ class InstitutionController extends Controller
 
             $institution->update($validated);
 
-            return redirect()->route('admin.entities.institutions.index')
+            return redirect()->route('entities.institutions.index')
                 ->with('toast', ['type' => 'success', 'message' => 'Institución actualizada con éxito.']);
         } catch (\Exception $e) {
             return redirect()->back()->with('toast', ['type' => 'error', 'message' => 'Error al actualizar la institución: ' . $e->getMessage()]);
@@ -206,7 +206,7 @@ class InstitutionController extends Controller
     {
         try {
             $institution->delete();
-            return redirect()->route('admin.entities.institutions.index')
+            return redirect()->route('entities.institutions.index')
                 ->with('toast', ['type' => 'success', 'message' => 'Institución eliminada con éxito.']);
         } catch (\Exception $e) {
             return redirect()->back()->with('toast', ['type' => 'error', 'message' => 'Error al eliminar la institución: ' . $e->getMessage()]);
