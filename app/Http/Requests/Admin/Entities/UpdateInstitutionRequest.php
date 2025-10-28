@@ -30,6 +30,9 @@ class UpdateInstitutionsRequest extends FormRequest
             'country' => ['nullable','string','max:50'],
             'province' => ['nullable','string','max:100'],
             'locality' => ['nullable','string','max:100'],
+            'country_id' => ['nullable', 'integer', 'exists:countries,id'],
+            'province_id' => ['nullable', 'integer', 'exists:provinces,id'],
+            'locality_id' => ['nullable', 'integer', 'exists:localities,id'],
             'address' => ['nullable','string','max:150'],
             'phone' => ['nullable','string','max:16'],
             'email' => ['nullable','email','max:100'],
@@ -48,6 +51,9 @@ class UpdateInstitutionsRequest extends FormRequest
             'country.max' => 'El nombre del país no puede exceder 50 caracteres.',
             'province.max' => 'El nombre de la provincia no puede exceder 100 caracteres.',
             'locality.max' => 'El nombre de la localidad no puede exceder 100 caracteres.',
+            'country_id.exists' => 'El país seleccionado no es válido.',
+            'province_id.exists' => 'La provincia seleccionada no es válida.',
+            'locality_id.exists' => 'La localidad seleccionada no es válida.',
         ];
     }
 }

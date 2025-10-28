@@ -31,6 +31,7 @@ class StoreDependenciesRequest extends FormRequest
             
             // Textos para crear o buscar nuevas ubicaciones
             'locality' => ['nullable','string','max:100'],
+            'locality_id' => ['nullable', 'integer', 'exists:localities,id'],
             
             'address' => ['nullable','string','max:150'],
             'phone' => ['nullable','string','max:16'],
@@ -52,6 +53,7 @@ class StoreDependenciesRequest extends FormRequest
             'email.email' => 'El formato del email es inválido.',
             'web.url' => 'El formato de la URL es inválido.',
             'locality.max' => 'El nombre de la localidad no puede exceder 100 caracteres.',
+            'locality_id.exists' => 'La localidad seleccionada no es válida.',
         ];
     }
 }

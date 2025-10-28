@@ -31,7 +31,7 @@ class UpdateDependenciesRequest extends FormRequest
             
             // Textos para crear o buscar nuevas ubicaciones
             'locality' => ['nullable','string','max:100'],
-            
+            'locality_id' => ['nullable', 'integer', 'exists:localities,id'],
             'address' => ['nullable','string','max:150'],
             'phone' => ['nullable','string','max:16'],
             'email' => ['nullable','string','max:100'],
