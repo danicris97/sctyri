@@ -39,6 +39,49 @@ class PersonPosition extends Model
     }
 
     /**
+     * Scopes
+     */
+    public function scopeSearch($query, $search)
+    {
+        if (empty($search)) {
+            return $query;
+        }
+
+        $query->where(function ($q) use ($search) {
+            $q->whereHas('person', function ($subQ) use ($search) {
+                $subQ->where('name', 'like', "%{$search}%")
+                    ->orWhere('surname', 'like', "%{$search}%")
+                    ->orWhere('dni', 'like', "%{$search}%");
+            })->orWhere('position', 'like', "%{$search}%");
+        });
+    }
+
+    public function scopeFilter($query, $filters)
+    {
+        if ($request->filled('position')) {
+            $query->where('position', 'like', '%' . $request->position . '%');
+        }
+
+        if ($request->filled('active')) {
+            $query->where('active', (bool) $request->active);
+        }
+    }
+
+    public function scopeOrdered($query, $sort, $direction)
+    {
+        if (in_array($sort, ['name', 'surname', 'dni'], true)) {
+            $query->orderBy(
+                Person::select($sort)
+                    ->whereColumn('person.id', 'person_positions.person_id'),
+                    $direction
+            );
+        } else {
+            $query->orderBy($sort, $direction);
+        }
+    }
+
+
+    /**
      * Funciones estaticas
      */
     public static function getOptions()

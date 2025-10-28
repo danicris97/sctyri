@@ -45,7 +45,7 @@ class StorePersonPositionRequest extends FormRequest
             ];
             $rules['person.phone'] = ['nullable', 'string', 'max:16'];
             $rules['person.address'] = ['nullable', 'string', 'max:150'];
-            $rules['person.nacionality'] = ['nullable', 'string', 'max:50'];
+            $rules['person.nationality'] = ['nullable', 'string', 'max:50'];
         }
 
         return $rules;
@@ -70,7 +70,7 @@ class StorePersonPositionRequest extends FormRequest
             'person.email.unique' => 'El email ya está registrado para otra persona.',
             'person.phone.max' => 'El teléfono debe ser menor a 16 caracteres.',
             'person.address.max' => 'El domicilio debe ser menor a 150 caracteres.',
-            'person.nacionality.max' => 'La nacionalidad debe ser menor a 50 caracteres.',
+            'person.nationality.max' => 'La nacionalidad debe ser menor a 50 caracteres.',
         ];
     }
 }

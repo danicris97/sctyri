@@ -14,6 +14,10 @@ use App\Enums\PersonPositionEnum;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Actions\Entities\{
+    CreatePersonPosition,
+    UpdatePersonPosition,
+};
 
 class PersonPositionController extends Controller
 {
@@ -30,61 +34,21 @@ class PersonPositionController extends Controller
         $sort = in_array($sort, $validSorts, true) ? $sort : 'created_at';
         $direction = in_array($direction, ['asc', 'desc'], true) ? $direction : 'desc';
 
-        $query = PersonPosition::query()
-            ->with(['person' => function ($query) {
-                $query->select('id', 'name', 'surname', 'dni', 'email', 'phone', 'address');
-            }]);
-
-        // Busqueda libre
-        if ($search !== '') {
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('person', function ($subQ) use ($search) {
-                    $subQ->where('name', 'like', "%{$search}%")
-                         ->orWhere('surname', 'like', "%{$search}%")
-                         ->orWhere('dni', 'like', "%{$search}%");
-                })->orWhere('position', 'like', "%{$search}%");
-            });
-        }
-
-        // Filtros especificos
-        if ($request->filled('position')) {
-            $query->where('position', 'like', '%' . $request->position . '%');
-        }
-
-        // Ordenamiento: si se ordena por campos de persona, usar subconsulta
-        if (in_array($sort, ['name', 'surname', 'dni'], true)) {
-            $query->orderBy(
-                Person::select($sort)
-                    ->whereColumn('person.id', 'person_positions.person_id'),
-                $direction
-            );
-        } else {
-            $query->orderBy($sort, $direction);
-        }
-
-        $personPositions = $query
+        $filters = $request->only(['position', 'active']);
+        
+        $personPosition = PersonPosition::with([
+            'person',
+            ])->search($filters['search'] ?? $search)
+            ->filter($filters)
+            ->ordered($sort, $direction)
             ->paginate(10)
             ->withQueryString()
             ->through(function (PersonPosition $personPosition) {
-                $person = $personPosition->person;
-
                 return [
-                    'id' => $personPosition->id,
-                    'position' => $personPosition->position,
-                    'active' => (bool) $personPosition->active,
-                    'created_at' => $personPosition->created_at?->toISOString(),
-                    'updated_at' => $personPosition->updated_at?->toISOString(),
-                    'person' => $person ? [
-                        'id' => $person->id,
-                        'name' => $person->name,
-                        'surname' => $person->surname,
-                        'dni' => $person->dni,
-                        'email' => $person->email,
-                        'phone' => $person->phone,
-                        'address' => $person->address,
-                    ] : null,
+                    ...$personPosition->toArray(),
+                    'person' => $personPosition->person,
                 ];
-            });
+        });
 
         return Inertia::render('admin/entities/person-position/index', [
             'person_positions' => $personPositions,
@@ -95,7 +59,6 @@ class PersonPositionController extends Controller
                 'position' => $request->get('position', ''),
             ],
             'positions' => PersonPositionEnum::options(),
-            'toast' => session('toast'),
         ]);
     }
 
@@ -105,7 +68,7 @@ class PersonPositionController extends Controller
     public function create()
     {   
         return Inertia::render('admin/entities/person-position/create', [
-            'persons' => Person::getDropdownOptionsDni(),
+            'persons' => Person::getOptions(),
             'positions' => PersonPositionEnum::options(),
         ]);
     }
@@ -113,9 +76,35 @@ class PersonPositionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePersonPositionRequest $request)
+    public function store(StorePersonPositionRequest $request, CreatePersonPosition $createPersonPosition)
     {
-        
+        try {
+            $personPosition = $createPersonPosition($request->validated());
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'toast' => ['type' => 'success', 'message' => 'Persona con cargo creada correctamente'],
+                    'person_position' => $personPosition->load('person')->toArray(),
+                ], 201);
+            }
+
+            return redirect()->route('admin.person-position.index')
+                ->with('toast', ['type' => 'success', 'message' => 'Persona con cargo creada correctamente']);
+        } catch (\Throwable $exception) {
+            Log::error('Error al crear la Persona con cargo.', [
+                'exception' => $exception,
+            ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'toast' => ['type' => 'error', 'message' => 'Error al crear la Persona con cargo. Por favor, intente de nuevo.'],
+                ], 500);
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->with('toast', ['type' => 'error', 'message' => 'Error al crear la Persona con cargo. Por favor, intente de nuevo.']);
+        }
     }
 
     /**
@@ -123,7 +112,9 @@ class PersonPositionController extends Controller
      */
     public function show(PersonPosition $personPosition)
     {
-        //
+        return Inertia::render('admin/person-position/show', [
+            'person_position' => $person_position,
+        ]);
     }
 
     /**
@@ -131,15 +122,43 @@ class PersonPositionController extends Controller
      */
     public function edit(PersonPosition $personPosition)
     {
-        //
+        return Inertia::render('admin/person-position/edit', [
+            'person_position' => $person_position,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePersonPositionRequest $request, PersonPosition $personPosition)
+    public function update(UpdatePersonPositionRequest $request, PersonPosition $personPosition, UpdatePersonPosition $updatePersonPosition)
     {
-        //
+        try {
+            $personPosition = $updatePersonPosition($request->validated());
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'toast' => ['type' => 'success', 'message' => 'Persona con cargo actualizada correctamente'],
+                    'person_position' => $personPosition->load('person')->toArray(),
+                ], 201);
+            }
+
+            return redirect()->route('admin.person-position.index')
+                ->with('toast', ['type' => 'success', 'message' => 'Persona con cargo actualizada correctamente']);
+        } catch (\Throwable $exception) {
+            Log::error('Error al actualizar la Persona con cargo.', [
+                'exception' => $exception,
+            ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'toast' => ['type' => 'error', 'message' => 'Error al actualizar la Persona con cargo. Por favor, intente de nuevo.'],
+                ], 500);
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->with('toast', ['type' => 'error', 'message' => 'Error al actualizar la Persona con cargo. Por favor, intente de nuevo.']);
+        }
     }
 
     /**
@@ -147,6 +166,13 @@ class PersonPositionController extends Controller
      */
     public function destroy(PersonPosition $personPosition)
     {
-        //
+        try {
+            $persona_rol->delete();
+            return redirect()->route('admin.person-position.index')
+                ->with('toast', ['type' => 'success', 'message' => 'Persona eliminada correctamente']);
+        } catch (\Exception $e) {
+            return redirect()->route('admin.person-position.index')
+                ->with('toast', ['type' => 'error', 'message' => 'Error al eliminar el persona: ' . $e->getMessage()]);
+        }
     }
 }
