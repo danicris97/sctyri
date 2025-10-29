@@ -27,7 +27,6 @@ class StoreAgreementRequest extends FormRequest
     {
         return [
             'type' => ['required', 'string', 'max:60', new Enum(AgreementEnum::class)],
-            'title' => ['nullable', 'string', 'max:255'],
             'date_signature' => ['required', 'date'],
             'duration' => ['required', 'integer'],
             'type_renewal' => ['nullable', 'string', 'max:30', new Enum(AgreementRenewalEnum::class)],

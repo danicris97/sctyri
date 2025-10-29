@@ -207,17 +207,17 @@ class Agreement extends Model
 
     public function getFormatedDateSignatureAttribute() : string
     {
-        return $this->date_signature->format('d-m-Y');
+        return $this->date_signature ? $this->date_signature->format('d-m-Y') : 'SIN FECHA DE FIRMA';
     }
 
     public function getFormatedDateEndAttribute() : string
     {
-        return $this->date_end->format('d-m-Y');
+        return $this->date_end ? $this->date_end->format('d-m-Y') : 'SIN FECHA DE FIN';
     }
 
     public function getFormatedDateRenewalAttribute() : string
     {
-        return $this->date_renewal->format('d-m-Y');
+        return $this->date_renewal ? $this->date_renewal->format('d-m-Y') : 'SIN FECHA DE RENOVACION';
     }
 
     /**
