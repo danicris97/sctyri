@@ -9,6 +9,7 @@ enum AgreementStatusEnum: string
     case Vencido = 'Vencido';
     case Renovado = 'Renovado';
     case Cancelado = 'Cancelado';
+    case Pendiente = 'Pendiente';
 
     public function label(): string
     {
@@ -18,6 +19,7 @@ enum AgreementStatusEnum: string
             self::Vencido => 'Vencido',
             self::Renovado => 'Renovado',
             self::Cancelado => 'Cancelado',
+            self::Pendiente => 'Pendiente',
         };
     }
 

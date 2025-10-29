@@ -41,3 +41,27 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export type Paginated<T> = {
+  data: T[];
+  meta: {
+    current_page: number;
+    last_page: number;
+    from: number;
+    to: number;
+    per_page: number;
+    total: number;
+  };
+  links: {
+    first: string | null;
+    last: string | null;
+    prev: string | null;
+    next: string | null;
+  };
+};
+
+export type Option = {
+  value: number
+  label: string
+}
+
