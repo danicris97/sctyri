@@ -9,17 +9,15 @@ import {
   CommandList,
 } from "@/components/ui/command"
 import { Button } from "@/components/ui/button"
-import { DropdownOption } from "@/types"
+import { Option } from "@/types"
 
 type ComboBoxProps = {
-  options: DropdownOption[]
-  value: string | null
-  onChange: (value: string | null) => void
+  options:Option[]
+  value: number | null
+  onChange: (value: number | null) => void
   placeholder?: string
   className?: string
-  /** Valor por defecto opcional que se muestra si no hay selección */
-  defaultValue?: string
-  /** Deshabilita el combobox completo (botón y apertura) */
+  defaultValue?: number | null
   disabled?: boolean
 }
 
@@ -29,7 +27,7 @@ export function ComboBox({
   onChange,
   placeholder = "Seleccionar...",
   className = "w-full",
-  defaultValue,
+  defaultValue = null,
   disabled = false,
 }: ComboBoxProps) {
   const [open, setOpen] = React.useState(false)
@@ -37,20 +35,19 @@ export function ComboBox({
   const containerRef = React.useRef<HTMLDivElement>(null)
   const buttonRef = React.useRef<HTMLButtonElement>(null)
 
+  const activeValue = value ?? defaultValue ?? null
   const selectedLabel =
-    options.find((opt) => String(opt.value) === value)?.label ??
-    (defaultValue
-      ? options.find((opt) => String(opt.value) === defaultValue)?.label
-      : placeholder)
+    activeValue !== null
+      ? options.find((opt) => opt.value === activeValue)?.label ?? placeholder
+      : placeholder
 
   const filteredOptions = options.filter((option) =>
     option.label.toLowerCase().includes(search.toLowerCase())
   )
 
-  const handleSelect = (selectedValue: string | number) => {
+  const handleSelect = (selectedValue: number) => {
     if (disabled) return
-    const normalized = String(selectedValue)
-    onChange(normalized === value ? null : normalized)
+    onChange(selectedValue === value ? null : selectedValue)
     setOpen(false)
   }
 
@@ -111,11 +108,7 @@ export function ComboBox({
                     <Check
                       className={cn(
                         "ml-auto h-4 w-4",
-                        (value
-                          ? String(opt.value) === value
-                          : defaultValue
-                            ? String(opt.value) === defaultValue
-                            : false)
+                        activeValue !== null && opt.value === activeValue
                           ? "opacity-100"
                           : "opacity-0"
                       )}

@@ -1,5 +1,4 @@
-import { Head } from "@inertiajs/react";
-import Subtitle from "@/components/website/subtitle";
+import Subtitle from "@/components/web/subtitle";
 import PageLayout from "@/layouts/web/page-layout";
 
 export default function Salientes(){

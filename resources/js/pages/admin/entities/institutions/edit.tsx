@@ -1,4 +1,4 @@
-import EntidadesLayout from '@/layouts/admin/entidades/layout';
+import EntidadesLayout from '@/layouts/admin/entities/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, DropdownOption } from '@/types';
 import { Head, usePage } from '@inertiajs/react';

@@ -3,7 +3,7 @@ import { ChevronDown, Menu, X, CircleUser } from "lucide-react";
 import { useState, useEffect } from "react";
 import { usePage } from "@inertiajs/react";
 import { type SharedData } from '@/types'; // Asegúrate de que esta ruta sea correcta
-import { WhatsAppLink } from '@/components/whatsapp-url';
+import { WhatsAppLink } from '@/components/web/whatsapp-url';
 import FacebookIcon from '@/components/icons/facebook';
 import InstagramIcon from '@/components/icons/instagram';
 

@@ -5,40 +5,30 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-interface BecasFormacionLayoutProps extends PropsWithChildren {
+interface EntitiesLayoutProps extends PropsWithChildren {
     title: string;
     description: string;
 }
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Becas de Formación',
-        href: route('becasFormacion.becasFormacion.index'),
+        title: 'Dependencias',
+        href: route('entities.dependencies.index'),
         icon: null,
     },
     {
-        title: 'Bajas',
-        href: route('becasFormacion.bajas.index'),
+        title: 'Instituciones',
+        href: route('entities.institutions.index'),
         icon: null,
     },
     {
-        title: 'Renovaciones',
-        href: route('becasFormacion.renovaciones.index'),
-        icon: null,
-    },
-    {
-        title: 'Becarios',
-        href: route('becasFormacion.becarios.index'),
-        icon: null,
-    },
-    {
-        title: 'Tutores',
-        href: route('becasFormacion.tutores.index'),
+        title: 'Personas',
+        href: route('entities.people.index'),
         icon: null,
     },
 ];
 
-export default function BecasFormacionLayout({ children, title, description }: BecasFormacionLayoutProps) {
+export default function EntitiesLayout({ children, title, description }: EntitiesLayoutProps) {
     if (typeof window === 'undefined') {
         return null;
     }

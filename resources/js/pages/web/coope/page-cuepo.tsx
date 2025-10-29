@@ -1,7 +1,4 @@
-import { Head } from "@inertiajs/react";
-import Navbar from "@/components/website/navbar";
-import Footer from "@/components/website/footer";
-import Subtitle from "@/components/website/subtitle";
+import Subtitle from "@/components/web/subtitle";
 import { Card, CardContent } from "@/components/ui/card";
 import { Instagram, Facebook, Linkedin } from "lucide-react";
 import PageLayout from "@/layouts/web/page-layout";

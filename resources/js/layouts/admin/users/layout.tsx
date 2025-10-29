@@ -5,35 +5,30 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-interface PasantiasLayoutProps extends PropsWithChildren {
+interface UsersLayoutProps extends PropsWithChildren {
     title: string;
     description: string;
 }
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Servicios Tecnicos Repetitivos',
-        href: route('serviciosRepetitivos.serviciosRepetitivos.index'),
+        title: 'Usuarios',
+        href: '#',
         icon: null,
     },
     {
-        title: 'Comitentes',
-        href: route('serviciosRepetitivos.comitentes.index'),
+        title: 'Crear Nuevo Usuario',
+        href: '#',
         icon: null,
     },
     {
-        title: 'Unidades Ejecutoras',
-        href: route('serviciosRepetitivos.unidadesEjecutoras.index'),
-        icon: null,
-    },
-    {
-        title: 'Personas Responsables',
-        href: route('serviciosRepetitivos.personasResponsables.index'),
+        title: 'Permisos',
+        href: '#',
         icon: null,
     },
 ];
 
-export default function PasantiasLayout({ children, title, description }: PasantiasLayoutProps) {
+export default function UsersLayout({ children, title, description }: UsersLayoutProps) {
     if (typeof window === 'undefined') {
         return null;
     }

@@ -5,30 +5,40 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-interface UsuariosLayoutProps extends PropsWithChildren {
+interface TrainingScholarshipsLayoutProps extends PropsWithChildren {
     title: string;
     description: string;
 }
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Usuarios',
-        href: route('usuarios.index'),
+        title: 'Becas de Formación',
+        href: '#',
         icon: null,
     },
     {
-        title: 'Crear Nuevo Usuario',
-        href: route('usuarios.create'),
-        icon: null,
-    },
-    /*{
-        title: 'Permisos',
+        title: 'Bajas',
         href: '#',
         icon: null,
-    },*/
+    },
+    {
+        title: 'Renovaciones',
+        href: '#',
+        icon: null,
+    },
+    {
+        title: 'Becarios',
+        href: '#',
+        icon: null,
+    },
+    {
+        title: 'Tutores',
+        href: '#',
+        icon: null,
+    },
 ];
 
-export default function UsuariosLayout({ children, title, description }: UsuariosLayoutProps) {
+export default function TrainingScholarshipsLayout({ children, title, description }: TrainingScholarshipsLayoutProps) {
     if (typeof window === 'undefined') {
         return null;
     }

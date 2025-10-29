@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { ComboBox } from "@/components/ui/combobox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import type { SearchFilters, SearchOptions } from "@/types"
+import type { SearchFilters, SearchOptions } from "@/types/search"
 
 export function PageSearchFilters({
   value,

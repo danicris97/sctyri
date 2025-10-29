@@ -1,18 +1,13 @@
 import { usePage, router } from "@inertiajs/react"
 import { useEffect, useMemo, useState } from "react"
-import dayjs from "dayjs"
-import "dayjs/locale/es"
 import { Filter, Search as SearchIcon } from "lucide-react"
 import { PageFilterDialog } from "@/components/dialogs/page-filter-dialog"
-import { ResultsList } from "@/components/website/result-list"
+import { ResultsList } from "@/components/web/result-list"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import type { BaseResult, DropdownOption, SearchFilters } from "@/types"
-import { route } from "ziggy-js"
+import type { BaseResult, DropdownOption, SearchFilters } from "@/types/search"
 import type { RequestPayload } from "@inertiajs/core"
-
-dayjs.locale("es")
 
 const normalizeFilters = (filters: SearchFilters | undefined): Record<string, unknown> => {
   if (!filters) return {}

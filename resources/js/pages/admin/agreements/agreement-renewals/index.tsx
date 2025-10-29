@@ -5,7 +5,7 @@ import { StatCard } from '@/components/stat-card';
 import { DataTable } from '@/components/ui/data-table';
 import { type RenovacionConvenioType } from '@/schemas/renovacion-convenio-schema';
 import AppLayout from '@/layouts/app-layout';
-import ConveniosLayout from '@/layouts/admin/convenios/layout';
+import ConveniosLayout from '@/layouts/admin/agreements/layout';
 import { useState, useEffect } from 'react';
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
 import { GenericDialog } from '@/components/ui/generic-dialog';

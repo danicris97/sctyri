@@ -1,8 +1,8 @@
-import EntidadesLayout from '@/layouts/admin/entidades/layout';
+import EntidadesLayout from '@/layouts/admin/entities/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type DropdownOption } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import PersonaRolForm from '@/components/forms/persona-rol-form';
+import PersonaRolForm from '@/components/forms/person-position-form';
 import { type PersonaRolFullType } from '@/schemas/persona-rol-schema';
 import { toast } from 'sonner';
 

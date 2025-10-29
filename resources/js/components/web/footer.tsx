@@ -2,7 +2,7 @@ import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import FacebookIcon from '@/components/icons/facebook';
 import InstagramIcon from '@/components/icons/instagram';
 import WhatsAppIcon from '@/components/icons/whatsapp';
-import { WhatsAppLink } from '@/components/whatsapp-url';
+import { WhatsAppLink } from '@/components/web/whatsapp-url';
 
 const cooperacionItems = [
     { title: "Guia de telefono", href: "https://obras.unsa.edu.ar/guia/index.php" },

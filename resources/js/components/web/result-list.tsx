@@ -1,5 +1,5 @@
-import { ResultCard } from "@/components/website/result-card"
-import { type BaseResult } from "@/types"
+import { ResultCard } from "@/components/web/result-card"
+import { type BaseResult } from "@/types/search"
 
 export function ResultsList({
   title = "Resultados",

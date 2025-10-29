@@ -1,6 +1,6 @@
 import PageLayout from "@/layouts/web/page-layout"
-import Subtitle from "@/components/website/subtitle"
-import { SearchPanel } from "@/components/website/search-panel"
+import Subtitle from "@/components/web/subtitle"
+import { SearchPanel } from "@/components/web/search-panel"
 
 export default function Search() {
   return (

@@ -1,4 +1,4 @@
-import DocumentosLayout from '@/layouts/admin/documentos/layout';
+import DocumentosLayout from '@/layouts/admin/documents/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';

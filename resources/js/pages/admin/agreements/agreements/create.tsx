@@ -1,4 +1,4 @@
-import ConveniosLayout from '@/layouts/admin/convenios/layout';
+import ConveniosLayout from '@/layouts/admin/agreements/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type DropdownOption } from '@/types';
 import { Head, usePage } from '@inertiajs/react';

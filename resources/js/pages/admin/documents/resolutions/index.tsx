@@ -2,7 +2,7 @@ import { BreadcrumbItem } from '@/types';
 import { Head, usePage, router } from '@inertiajs/react';
 import { DataTable } from '@/components/ui/data-table';
 import AppLayout from '@/layouts/app-layout';
-import DocumentosLayout from '@/layouts/admin/documentos/layout';
+import DocumentosLayout from '@/layouts/admin/documents/layout';
 import { useState, useEffect, useRef } from 'react';
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
 import { GenericDialog } from '@/components/ui/generic-dialog';

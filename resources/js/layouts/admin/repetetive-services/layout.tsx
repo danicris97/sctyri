@@ -5,45 +5,35 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-interface PasantiasLayoutProps extends PropsWithChildren {
+interface RepetetiveServicesLayoutProps extends PropsWithChildren {
     title: string;
     description: string;
 }
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Pasantías',
-        href: route('pasantias.pasantias.index'),
+        title: 'Servicios Tecnicos Repetitivos',
+        href: '#',
         icon: null,
     },
     {
-        title: 'Bajas',
-        href: route('pasantias.bajas.index'),
+        title: 'Comitentes',
+        href: '#',
         icon: null,
     },
     {
-        title: 'Renovaciones',
-        href: route('pasantias.renovaciones.index'),
+        title: 'Unidades Ejecutoras',
+        href: '#',
         icon: null,
     },
     {
-        title: 'Pasantes',
-        href: route('pasantias.pasantes.index'),
-        icon: null,
-    },
-    {
-        title: 'Docentes',
-        href: route('pasantias.docentes.index'),
-        icon: null,
-    },
-    {
-        title: 'Tutores',
-        href: route('pasantias.tutores.index'),
+        title: 'Personas Responsables',
+        href: '#',
         icon: null,
     },
 ];
 
-export default function PasantiasLayout({ children, title, description }: PasantiasLayoutProps) {
+export default function RepetetiveServicesLayout({ children, title, description }: RepetetiveServicesLayoutProps) {
     if (typeof window === 'undefined') {
         return null;
     }

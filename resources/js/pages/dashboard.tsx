@@ -3,7 +3,7 @@ import { Clock, TrendingDown, TrendingUp } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { SearchPanel } from '@/components/website/search-panel';
+import { SearchPanel } from '@/components/web/search-panel';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

@@ -1,4 +1,4 @@
-import Subtitle from "@/components/website/subtitle";
+import Subtitle from "@/components/web/subtitle";
 import { Card, CardContent } from "@/components/ui/card";
 import PageLayout from "@/layouts/web/page-layout";
 

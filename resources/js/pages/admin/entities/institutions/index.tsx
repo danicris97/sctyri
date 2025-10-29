@@ -5,7 +5,7 @@ import { StatCard } from '@/components/stat-card';
 import { DataTable } from '@/components/ui/data-table';
 import { type InstitucionType } from '@/schemas/institucion-schema';
 import AppLayout from '@/layouts/app-layout';
-import EntidadesLayout from '@/layouts/admin/entidades/layout';
+import EntidadesLayout from '@/layouts/admin/entities/layout';
 import { useState, useEffect } from 'react';
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
 import { GenericDialog } from '@/components/ui/generic-dialog';

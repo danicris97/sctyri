@@ -1,4 +1,4 @@
-import Subtitle from "@/components/website/subtitle";
+import Subtitle from "@/components/web/subtitle";
 import PageLayout from "@/layouts/web/page-layout";
 import ContactForm from "@/components/forms/contact-form";
 

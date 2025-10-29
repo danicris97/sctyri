@@ -3,7 +3,7 @@ import { MultiSelect, type Option } from "@/components/ui/multiselect";
 import type { ConvenioFullType } from "@/schemas/convenio-schema";
 import InstitucionForm from "@/components/forms/institucion-form";
 import DependenciaUnsaForm from "@/components/forms/dependencia-unsa-form";
-import PersonaRolForm from "@/components/forms/persona-rol-form";
+import PersonaRolForm from "@/components/forms/person-position-form";
 import axios from "axios";
 import { toast } from "sonner";
 import { DropdownOption } from "@/types";

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import EntidadesLayout from '@/layouts/admin/entidades/layout';
+import EntidadesLayout from '@/layouts/admin/entities/layout';
 import { BreadcrumbItem, DropdownOption } from '@/types';
 import { DataTable } from '@/components/ui/data-table';
 import type { PersonaRolFullType } from '@/schemas/persona-rol-schema';

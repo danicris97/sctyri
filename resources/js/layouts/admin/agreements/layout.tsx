@@ -5,7 +5,7 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-interface ConveniosLayoutProps extends PropsWithChildren {
+interface AgreementsLayoutProps extends PropsWithChildren {
     title: string;
     description: string;
 }
@@ -13,27 +13,22 @@ interface ConveniosLayoutProps extends PropsWithChildren {
 const sidebarNavItems: NavItem[] = [
     {
         title: 'Convenios',
-        href: route('convenios.convenios.index'),
+        href: route('agreements.agreements.index'),
         icon: null,
     },
     {
         title: 'Bajas',
-        href: route('convenios.bajas.index'),
+        href: route('agreements.agreement-cancellation.index'),
         icon: null,
     },
     {
         title: 'Renovaciones',
-        href: route('convenios.renovaciones.index'),
-        icon: null,
-    },
-    {
-        title: 'Firmantes UNSa',
-        href: route('convenios.firmantesUnsa.index'),
+        href: route('agreements.agreement-renewals.index'),
         icon: null,
     },
 ];
 
-export default function ConveniosLayout({ children, title, description }: ConveniosLayoutProps) {
+export default function AgreementsLayout({ children, title, description }: AgreementsLayoutProps) {
     if (typeof window === 'undefined') {
         return null;
     }

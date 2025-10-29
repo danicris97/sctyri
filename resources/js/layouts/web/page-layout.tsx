@@ -1,7 +1,7 @@
 import { Head } from "@inertiajs/react";
-import Navbar from "@/components/website/navbar";
-import Footer from "@/components/website/footer";
-import WhatsappFloat from "@/components/whatsapp-float";
+import Navbar from "@/components/web/navbar";
+import Footer from "@/components/web/footer";
+import WhatsappFloat from "@/components/web/whatsapp-float";
 
 export default function PageLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -13,7 +13,7 @@ export default function PageLayout({ children }: { children: React.ReactNode }) 
 
             <Navbar/>
 
-             <WhatsappFloat phone="5493875391627" defaultText="Hola, quisiera mas información." />
+            <WhatsappFloat phone="5493875391627" defaultText="Hola, quisiera mas información." />
 
             {children}
 

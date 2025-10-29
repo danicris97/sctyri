@@ -9,7 +9,7 @@ export interface Person {
     email: string | null;
     phone: string | null;
     address: string | null;
-    nationality: id | null;
+    nationality: number | null;
     created_at: Date;
     updated_at: Date;
     deleted_at: Date | null;
@@ -23,4 +23,22 @@ export interface PersonPosition {
     created_at: Date;
     updated_at: Date;
     deleted_at: Date | null;
+    person: Person;
+}
+
+export interface PersonPositionFormData {
+    id?: number;
+    person_id: number | null;
+    position: PersonPositionType | '';
+    active: boolean;
+    person: {
+        id?: number;
+        name: string;
+        surname: string;
+        dni: string | null;
+        email: string | null;
+        phone: string | null;
+        address: string | null;
+        nationality: number | string | null;
+    };
 }

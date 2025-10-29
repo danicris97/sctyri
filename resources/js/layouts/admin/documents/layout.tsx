@@ -5,35 +5,30 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-interface EntidadesLayoutProps extends PropsWithChildren {
+interface DocumentsLayoutProps extends PropsWithChildren {
     title: string;
     description: string;
 }
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Dependencias UNSa',
-        href: route('entidades.dependenciasUnsa.index'),
+        title: 'Expedientes',
+        href: route('documents.files.index'),
         icon: null,
     },
     {
-        title: 'Instituciones',
-        href: route('entidades.instituciones.index'),
+        title: 'Resoluciones',
+        href: route('documents.resolutions.index'),
         icon: null,
     },
     {
-        title: 'Carreras',
-        href: route('entidades.carreras.index'),
+        title: 'Movimientos',
+        href: route('documents.movements.index'),
         icon: null,
-    },
-    {
-        title: 'Personas',
-        href: route('entidades.personas.index'),
-        icon: null,
-    },
+    }
 ];
 
-export default function EntidadesLayout({ children, title, description }: EntidadesLayoutProps) {
+export default function DocumentsLayout({ children, title, description }: DocumentsLayoutProps) {
     if (typeof window === 'undefined') {
         return null;
     }

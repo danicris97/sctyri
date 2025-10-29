@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import { type ResultKind, BaseResult } from "@/types"
+import { type ResultKind, BaseResult } from "@/types/search"
 
 const statusClasses: Record<string, string> = {
   Abierto: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",

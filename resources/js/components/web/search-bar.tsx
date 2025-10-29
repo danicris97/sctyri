@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Filter, Search as SearchIcon } from "lucide-react"
 import { PageSearchFilters } from "@/components/dialogs/page-search-filters"
-import type { SearchFilters, SearchOptions } from "@/types"
+import type { SearchFilters, SearchOptions } from "@/types/search"
 
 export function SearchBar({
   initialQuery = "",

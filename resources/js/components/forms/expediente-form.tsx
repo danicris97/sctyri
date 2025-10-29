@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { GenericDialog } from '@/components/ui/generic-dialog';
 import DependenciaUnsaForm from '@/components/forms/dependencia-unsa-form';
 import InstitucionForm from '@/components/forms/institucion-form';
-import PersonaRolForm from '@/components/forms/persona-rol-form';
+import PersonaRolForm from '@/components/forms/person-position-form';
 import type { ExpedienteType } from '@/schemas/expediente-schema';
 import type { DropdownOption } from '@/types';
 
