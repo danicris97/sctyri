@@ -5,11 +5,7 @@ import { Button } from "./button"
 import { Label } from "./label"
 import { ComboBox } from "./combobox"
 import { GenericDialog } from "./generic-dialog"
-
-export type Option = {
-  value: string
-  label: string
-}
+import { Option } from "@/types"
 
 type MultiSelectProps = {
   label: string

@@ -2,7 +2,7 @@ import ConveniosLayout from '@/layouts/admin/agreements/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, DropdownOption } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import RenovacionConvenioForm from '@/components/forms/renovacion-convenio-form';
+import RenovacionConvenioForm from '@/components/forms/agreement-renewal-form';
 
 export default function CreateRenovacionConvenio() {
   const breadcrumbs: BreadcrumbItem[] = [

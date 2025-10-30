@@ -4,15 +4,14 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { ComboBox } from "@/components/ui/combobox"
-import { useErrors } from "@/hooks/use-errors"
-import type { ResolucionFullType } from "@/schemas/resolucion-schema"
-import { DropdownOption } from "@/types"
+import type { ResolutionFormData } from "@/types/resolution"
+import { Option } from "@/types"
 
 type ResolucionSectionProps = {
-  resolucion?: ResolucionFullType | null
-  resoluciones_tipos: DropdownOption[]
-  expedientes: DropdownOption[]
-  onResolucionChange: (key: keyof ResolucionFullType, value: any) => void
+  resolucion?: ResolutionFormData | null
+  resoluciones_tipos: Option[]
+  expedientes: Option[]
+  onResolucionChange: (key: keyof ResolutionFormData, value: any) => void
   onOpenNewExpediente?: () => void
   errors: Record<string, string>
 }

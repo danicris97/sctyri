@@ -34,7 +34,6 @@ class StoreAgreementRequest extends FormRequest
             'object' => ['nullable', 'string', 'max:255'],
             'summary' => ['nullable', 'string', 'max:255'],
             'observations' => ['nullable', 'string', 'max:255'],
-            'date_end' => ['nullable', 'date'],
 
             'resolution.number' => ['required', 'string', 'max:5'],
             'resolution.date' => ['required', 'date'],

@@ -2,7 +2,7 @@ import DocumentosLayout from '@/layouts/admin/documents/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, DropdownOption } from '@/types';
 import { Head } from '@inertiajs/react';
-import ExpedienteForm from '@/components/forms/expediente-form';
+import ExpedienteForm from '@/components/forms/file-form';
 import { usePage } from '@inertiajs/react';
 
 export default function CreateExpediente() {

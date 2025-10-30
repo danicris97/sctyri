@@ -1,71 +1,70 @@
 import { useState } from "react";
-import { MultiSelect, type Option } from "@/components/ui/multiselect";
-import type { ConvenioFullType } from "@/schemas/convenio-schema";
-import InstitucionForm from "@/components/forms/institution-form";
-import DependenciaUnsaForm from "@/components/forms/dependency-form";
-import PersonaRolForm from "@/components/forms/person-position-form";
+import { MultiSelect } from "@/components/ui/multiselect";
+import InstitutionForm from "@/components/forms/institution-form";
+import DependencyForm from "@/components/forms/dependency-form";
+import PersonPositionsForm from "@/components/forms/person-position-form";
 import axios from "axios";
 import { toast } from "sonner";
-import { DropdownOption } from "@/types";
+import { Option } from "@/types";
+import { AgreementFormData } from "@/types/agreement"
 
 export function RelationsSection({
   data,
-  institucionesProps,
-  unidadesAcademicasProps,
-  firmantesUnsaProps,
+  institutionsProps,
+  dependenciesProps,
+  personPositionsProps,
   onChange,
-  instituciones_tipos,
-  unidades_academicas_tipos,
-  personas,
-  roles,
+  institutions_types,
+  dependencies_types,
+  persons,
+  positions,
 }: {
-  data: ConvenioFullType;
-  institucionesProps: Option[];
-  unidadesAcademicasProps: Option[];
-  firmantesUnsaProps: Option[];
-  onChange: (key: keyof ConvenioFullType, value: any) => void;
-  instituciones_tipos: DropdownOption[];
-  unidades_academicas_tipos: DropdownOption[];
-  personas: DropdownOption[];
-  roles: DropdownOption[];
+  data: AgreementFormData;
+  institutionsProps: Option[];
+  dependenciesProps: Option[];
+  personPositionsProps: Option[];
+  onChange: (key: keyof AgreementFormData, value: any) => void;
+  institutions_types: Option[];
+  dependencies_types: Option[];
+  persons: Option[];
+  positions: Option[];
 }) {
-  const [instituciones, setInstituciones] = useState<Option[]>(institucionesProps);
-  const [unidadesAcademicas, setUnidadesAcademicas] = useState<Option[]>(unidadesAcademicasProps);
-  const [firmantesUnsa, setFirmantesUnsa] = useState<Option[]>(firmantesUnsaProps);
+  const [institutions, setInstitutions] = useState<Option[]>(institutionsProps);
+  const [dependencies, setDependencies] = useState<Option[]>(dependenciesProps);
+  const [personPositions, setPersonPositions] = useState<Option[]>(personPositionsProps);
 
   return (
     <div className="p-4 bg-white rounded shadow space-y-6">
       <MultiSelect
         label="Instituciones"
-        options={instituciones}
-        selected={data.instituciones?.map((inst) => ({
+        options={institutions}
+        selected={data.institutions?.map((inst) => ({
           value: String(inst.id),
-          label: inst.nombre,
+          label: inst.name,
         })) || []}
         onSelectedChange={(selectedOptions) =>
-          onChange("instituciones", selectedOptions.map(opt => ({ id: parseInt(opt.value), nombre: opt.label })))
+          onChange("institutions", selectedOptions.map(opt => ({ id: parseInt(opt.value), name: opt.label })))
         }
         withCreate
         createForm={({ onSuccess }) => (
-          <InstitucionForm
-            tipos={instituciones_tipos}
-            isModal={true}
+          <InstitutionForm
+            types={institutions_types}
             onSuccess={(nuevo) => {
-              const nuevaOption: Option = { value: String(nuevo.id), label: nuevo.nombre };
-              onSuccess(nuevaOption);
+              const newOption: Option = { value: String(nuevo.id), label: nuevo.name };
+              onSuccess(newOption);
             }}
           />
         )}
         onCreated={(nuevo: unknown) => {
-          const nuevaOption = nuevo as Option;
+          const newOption = nuevo as Option;
           // Validar que label no sea undefined
-          if (!nuevaOption.label) {
-            console.error('Label undefined para nueva opción:', nuevaOption);
+          if (!newOption.label) {
+            console.error('Label undefined para nueva opción:', newOption);
             return;
           }
-          setInstituciones((prev: Option[]) => [...prev, nuevaOption]);
-          onChange("instituciones", [...(data.instituciones || []), 
-          { id: parseInt(nuevaOption.value), nombre: nuevaOption.label }]);
+          setInstitutions((prev: Option[]) => [...prev, newOption]); 
+          onChange("institutions", [...(data.institutions || []), 
+          { id: parseInt(newOption.value), name: newOption.label }]);
         }}
         placeholder="Buscar instituciones..."
         editRoute={route('entidades.instituciones.edit', ':id')}
@@ -73,30 +72,29 @@ export function RelationsSection({
 
       <MultiSelect
         label="Unidades Académicas"
-        options={unidadesAcademicas}
-        selected={data.dependencias_unsa?.map((unidad) => ({
+        options={dependencies}
+        selected={data.dependencies?.map((unidad) => ({
           value: String(unidad.id),
-          label: unidad.nombre,
+          label: unidad.name,
         })) || []}
         onSelectedChange={(selectedOptions) =>
-          onChange("dependencias_unsa", selectedOptions.map(opt => ({ id: parseInt(opt.value), nombre: opt.label })))
+          onChange("dependencies", selectedOptions.map(opt => ({ id: parseInt(opt.value), name: opt.label })))
         }
         withCreate
         createForm={({ onSuccess }) => (
-          <DependenciaUnsaForm
-            tipos={unidades_academicas_tipos}
-            isModal={true}
+          <DependencyForm
+            types={dependencies_types}
             onSuccess={(nuevo) => {
-              const nuevaOption: Option = { value: String(nuevo.id), label: nuevo.nombre };
-              onSuccess(nuevaOption);
+              const newOption: Option = { value: String(nuevo.id), label: nuevo.name };
+              onSuccess(newOption);
             }}
           />
         )}
         onCreated={(nuevo: unknown) => {
-          const nuevaOption = nuevo as Option;
-          setUnidadesAcademicas((prev: Option[]) => [...prev, nuevaOption]);
-          onChange("dependencias_unsa", [...(data.dependencias_unsa || []), 
-          { id: parseInt(nuevaOption.value), nombre: nuevaOption.label }]);
+          const newOption = nuevo as Option;
+          setDependencies((prev: Option[]) => [...prev, newOption]);
+          onChange("dependencies", [...(data.dependencies || []), 
+          { id: parseInt(newOption.value), name: newOption.label }]);
         }}
         placeholder="Buscar unidades académicas..."
         editRoute={route('entidades.dependenciasUnsa.edit', ':id')}
@@ -104,27 +102,27 @@ export function RelationsSection({
 
       <MultiSelect
         label="Firmantes por la UNSa"
-        options={firmantesUnsa}
-        selected={data.firmantes_unsa?.map((firmante) => ({
+        options={personPositions}
+        selected={data.person_positions?.map((firmante) => ({
           value: String(firmante.id),
-          label: firmante.persona.nombre,
+          label: firmante.person.name,
         })) || []}
         onSelectedChange={(selectedOptions) =>
-          onChange("firmantes_unsa", selectedOptions.map(opt => ({ id: parseInt(opt.value), persona: { id: parseInt(opt.value), nombre: opt.label } })))
+          onChange("person_positions", selectedOptions.map(opt => ({ id: parseInt(opt.value), person: { id: parseInt(opt.value), name: opt.label } })))
         }
         withCreate
         createForm={({ onSuccess }) => ( 
           
-          <PersonaRolForm
-            roles={roles}
-            personas={personas}
+          <PersonPositionsForm
+            positions={positions}
+            persons={persons}
             isModal={true}
             onSubmit={async (formData) => {
               try {
                 const res = await axios.post(route("convenios.firmantesUnsa.store"), formData);
                 toast.success("Firmante creado");
-                const nuevaOption: Option = { value: String(res.data.data.id), label: res.data.data.persona.nombre + ' ' + res.data.data.persona.apellido + ' - ' + res.data.data.persona.dni || 'N/D' };
-                onSuccess(nuevaOption);
+                const newOption: Option = { value: String(res.data.data.id), label: res.data.data.person.nombre + ' ' + res.data.data.person.apellido + ' - ' + res.data.data.person.dni || 'N/D' };
+                onSuccess(newOption);
               } catch (e) {
                 toast.error("Error al crear firmante");
               }
@@ -132,10 +130,10 @@ export function RelationsSection({
           />
         )}
         onCreated={(nuevo: unknown) => {
-          const nuevaOption = nuevo as Option;
-          setFirmantesUnsa((prev: Option[]) => [...prev, nuevaOption]);
-          onChange("firmantes_unsa", [...(data.firmantes_unsa || []), 
-          { id: parseInt(nuevaOption.value), persona: { id: parseInt(nuevaOption.value), nombre: nuevaOption.label } }]);
+          const newOption = nuevo as Option;
+          setPersonPositions((prev: Option[]) => [...prev, newOption]);
+          onChange("person_positions", [...(data.person_positions || []), 
+          { id: parseInt(newOption.value), person: { id: parseInt(newOption.value), name: newOption.label } }]);
         }}
         placeholder="Buscar firmantes..."
         editRoute={route('convenios.firmantesUnsa.edit', ':id')}

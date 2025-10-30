@@ -2,7 +2,7 @@ import ConveniosLayout from '@/layouts/admin/agreements/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, DropdownOption } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import BajaConvenioForm from '@/components/forms/baja-convenio-form';
+import BajaConvenioForm from '@/components/forms/agreement-cancellation-form';
 
 export default function CreateBajaConvenios() {
   const breadcrumbs: BreadcrumbItem[] = [

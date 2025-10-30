@@ -2,7 +2,7 @@ import DocumentosLayout from '@/layouts/admin/documents/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import ExpedienteMovimientoForm from '@/components/forms/expediente-movimiento-form';
+import ExpedienteMovimientoForm from '@/components/forms/file-movement-form';
 import { type ExpedienteMovimientoType } from '@/schemas/expediente-movimiento-schema';
 import { route } from 'ziggy-js';
 

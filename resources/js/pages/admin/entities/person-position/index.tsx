@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import EntidadesLayout from '@/layouts/admin/entities/layout';
-import { BreadcrumbItem, DropdownOption } from '@/types';
+import EntitiesLayout from '@/layouts/admin/entities/layout';
+import { BreadcrumbItem, Option, FlashToast } from '@/types';
 import { DataTable } from '@/components/ui/data-table';
-import type { PersonaRolFullType } from '@/schemas/persona-rol-schema';
-import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
-import { GenericDialog } from '@/components/ui/generic-dialog';
+import { PersonPosition } from '@/types/person';
+import { ConfirmDeleteDialog } from '@/components/dialogs/confirm-delete-dialog';
+import { GenericDialog } from '@/components/dialogs/generic-dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { SimpleDetailList, buildDetailItems } from '@/components/ui/simple-detail-list';
 import { toast } from 'sonner';
 import { route } from 'ziggy-js';
 import { ComboBox } from '@/components/ui/combobox';
@@ -17,18 +16,13 @@ import { ComboBox } from '@/components/ui/combobox';
 const breadcrumbs: BreadcrumbItem[] = [
   {
     title: 'Personas',
-    href: route('entidades.personas.index'),
+    href: route('entities.person-position.index'),
   },
 ];
 
-type FlashToast = {
-  type: 'success' | 'error';
-  message: string;
-};
-
-type PersonasIndexProps = {
-  personas: {
-    data: PersonaRolFullType[];
+type PersonsIndexProps = {
+  personPositions: {
+    data: PersonPosition[];
     current_page: number;
     last_page: number;
     total: number;
@@ -37,35 +31,34 @@ type PersonasIndexProps = {
   sort?: string;
   direction?: 'asc' | 'desc';
   filters?: {
-    rol?: string | null;
+    position?: string | null;
   } | null;
   toast?: FlashToast;
-  roles: DropdownOption[];
+  positions: Option[];
 };
 
-export default function PersonasIndex() {
+export default function PersonsIndex() {
   const {
-    personas,
+    personPositions,
     search,
     sort,
     direction,
     filters: initialFilters,
     toast: flashToast,
-    roles,
-  } = usePage().props as unknown as PersonasIndexProps;
+    positions,
+  } = usePage().props as unknown as PersonsIndexProps;
 
-  const [personaToShow, setPersonaToShow] = useState<PersonaRolFullType | null>(null);
-  const [personaToDelete, setPersonaToDelete] = useState<PersonaRolFullType | null>(null);
+  const [personToDelete, setPersonToDelete] = useState<PersonPosition | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
-    rol: initialFilters?.rol ?? '',
+    position: initialFilters?.position ?? '',
   });
 
   useEffect(() => {
     setFilters({
-      rol: initialFilters?.rol ?? '',
+      position: initialFilters?.position ?? '',
     });
-  }, [initialFilters?.rol]);
+  }, [initialFilters?.position]);
 
   useEffect(() => {
     if (!flashToast) return;
@@ -77,19 +70,19 @@ export default function PersonasIndex() {
   const columns = [
     {
       title: 'Nombre',
-      accessor: 'nombre',
+      accessor: 'name',
       sortable: true,
       width: '180px',
       align: 'center' as const,
-      render: (row: PersonaRolFullType) => row.persona.nombre,
+      render: (row: PersonPosition) => row.person.name,
     },
     {
       title: 'Apellido',
-      accessor: 'apellido',
+      accessor: 'surname',
       sortable: true,
       width: '180px',
       align: 'center' as const,
-      render: (row: PersonaRolFullType) => row.persona.apellido,
+      render: (row: PersonPosition) => row.person.surname,
     },
     {
       title: 'DNI',
@@ -97,11 +90,11 @@ export default function PersonasIndex() {
       sortable: true,
       width: '180px',
       align: 'center' as const,
-      render: (row: PersonaRolFullType) => row.persona.dni ?? '',
+      render: (row: PersonPosition) => row.person.dni ?? '',
     },
     {
-      title: 'Rol',
-      accessor: 'rol',
+      title: 'Cargo',
+      accessor: 'position',
       sortable: true,
       width: '180px',
       align: 'center' as const,
@@ -116,27 +109,27 @@ export default function PersonasIndex() {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Personas" />
-      <EntidadesLayout
+      <EntitiesLayout
         title="Personas"
-        description="Personas que firmaron convenios institucionales por el lado de la universidad"
+        description="Personas registradas en el sistema"
       >
         <div className="flex h-full flex-grow flex-col gap-4 rounded-xl p-4 overflow-x-auto">
           <DataTable
             title="Listado de Personas"
-            data={personas.data}
-            totalItems={personas.total}
+            data={personPositions.data}
+            totalItems={personPositions.total}
             columns={columns}
-            currentPage={personas.current_page}
-            totalPages={personas.last_page}
+            currentPage={personPositions.current_page}
+            totalPages={personPositions.last_page}
             onPageChange={(page) => {
               router.get(
-                route('entidades.personas.index'),
+                route('entidades.persons-positions.index'),
                 {
                   page,
                   search,
                   sort,
                   direction,
-                  rol: filters.rol || undefined,
+                  position: filters.position || undefined,
                 },
                 {
                   preserveState: true,
@@ -146,12 +139,12 @@ export default function PersonasIndex() {
             }}
             onSort={(column, nextDirection) => {
               router.get(
-                route('entidades.personas.index'),
+                route('entidades.persons-positions.index'),
                 {
                   search,
                   sort: column,
                   direction: nextDirection,
-                  rol: filters.rol || undefined,
+                  position: filters.position || undefined,
                   page: 1,
                 },
                 {
@@ -163,12 +156,12 @@ export default function PersonasIndex() {
             defaultSort={defaultSort}
             onSearch={(value) => {
               router.get(
-                route('entidades.personas.index'),
+                route('entidades.persons-positions.index'),
                 {
                   search: value,
                   sort,
                   direction,
-                  rol: filters.rol || undefined,
+                  position: filters.position || undefined,
                   page: 1,
                 },
                 {
@@ -178,85 +171,14 @@ export default function PersonasIndex() {
               );
             }}
             onOpenFilter={() => setShowFilters(true)}
-            actionLinks={(row: PersonaRolFullType) => ({
-              view: () => setPersonaToShow(row),
-              edit: route('entidades.personas.edit', row.id),
-              delete: () => setPersonaToDelete(row),
+            actionLinks={(row: PersonPosition) => ({
+              view: route('entidades.persons-positions.show', row.id),
+              edit: route('entidades.persons-positions.edit', row.id),
+              delete: () => setPersonToDelete(row),
             })}
           />
         </div>
-      </EntidadesLayout>
-
-      <GenericDialog
-        open={!!personaToShow}
-        onClose={() => setPersonaToShow(null)}
-        title="Detalles de la persona"
-        description="Informacion completa de la persona seleccionada"
-        footer={
-          <Button
-            className="bg-[#0e3b64] text-white hover:bg-[#3e7fca]"
-            onClick={() => {
-              if (!personaToShow) return;
-              router.get(route('entidades.personas.edit', personaToShow.id));
-            }}
-          >
-            Editar
-          </Button>
-        }
-      >
-        <SimpleDetailList
-          items={buildDetailItems(personaToShow ?? {}, [
-            {
-              key: 'persona.nombre',
-              label: 'Nombre',
-              hideIfEmpty: true,
-              transform: () => personaToShow?.persona.nombre ?? '',
-            },
-            {
-              key: 'persona.apellido',
-              label: 'Apellido',
-              hideIfEmpty: true,
-              transform: () => personaToShow?.persona.apellido ?? '',
-            },
-            {
-              key: 'persona.dni',
-              label: 'DNI',
-              hideIfEmpty: true,
-              transform: () => personaToShow?.persona.dni ?? '',
-            },
-            {
-              key: 'rol',
-              label: 'Rol',
-              hideIfEmpty: true,
-            },
-            {
-              key: 'persona.email',
-              label: 'Email',
-              hideIfEmpty: true,
-              transform: () => personaToShow?.persona.email ?? '',
-            },
-            {
-              key: 'persona.telefono',
-              label: 'Telefono',
-              hideIfEmpty: true,
-              transform: () => personaToShow?.persona.telefono ?? '',
-            },
-            {
-              key: 'persona.domicilio',
-              label: 'Domicilio',
-              hideIfEmpty: true,
-              transform: () => personaToShow?.persona.domicilio ?? '',
-            },
-            {
-              key: 'activo',
-              label: 'Activo',
-              isBoolean: true,
-              trueText: 'Si',
-              falseText: 'No',
-            },
-          ])}
-        />
-      </GenericDialog>
+      </EntitiesLayout>
 
       <GenericDialog
         open={showFilters}
@@ -268,8 +190,8 @@ export default function PersonasIndex() {
             <Button
               variant="outline"
               onClick={() => {
-                setFilters({ rol: '' });
-                router.get(route('entidades.personas.index'));
+                setFilters({ position: '' });
+                router.get(route('entidades.persons-positions.index'));
                 setShowFilters(false);
               }}
             >
@@ -280,12 +202,12 @@ export default function PersonasIndex() {
               className="bg-[#0e3b64] text-white hover:bg-[#3e7fca]"
               onClick={() => {
                 router.get(
-                  route('entidades.personas.index'),
+                  route('entidades.persons-positions.index'),
                   {
                     search,
                     sort,
                     direction,
-                    rol: filters.rol || undefined,
+                    position: filters.position || undefined,
                     page: 1,
                   },
                   { preserveState: true },
@@ -300,27 +222,27 @@ export default function PersonasIndex() {
       >
         <div className="space-y-4">
           <div>
-            <Label htmlFor="tipo">Tipo</Label>
+            <Label htmlFor="tipo">Cargo</Label>
             <ComboBox
-              options={roles}
-              value={filters.rol}
-              onChange={(val) => setFilters({ ...filters, rol: val ?? '' })}
-              placeholder="Seleccione un tipo"
+              options={positions}
+              value={filters.position}
+              onChange={(val) => setFilters({ ...filters, position: val ?? '' })}
+              placeholder="Seleccione un cargo"
             />
           </div>
         </div>
       </GenericDialog>
 
       <ConfirmDeleteDialog
-        open={!!personaToDelete}
-        onCancel={() => setPersonaToDelete(null)}
+        open={!!personToDelete}
+        onCancel={() => setPersonToDelete(null)}
         onConfirm={() => {
-          if (!personaToDelete) return;
-          router.delete(route('entidades.personas.destroy', personaToDelete.id));
-          setPersonaToDelete(null);
+          if (!personToDelete) return;
+          router.delete(route('entidades.persons-positions.destroy', personToDelete.id));
+          setPersonToDelete(null);
         }}
         title="Eliminar persona?"
-        description={`Estas seguro que deseas eliminar a ${personaToDelete?.persona.apellido ?? ''} ${personaToDelete?.persona.nombre ?? ''}? Esta accion no se puede deshacer.`}
+        description={`Estas seguro que deseas eliminar a ${personToDelete?.person.surname ?? ''} ${personToDelete?.person.name ?? ''}? Esta accion no se puede deshacer.`}
       />
     </AppLayout>
   );

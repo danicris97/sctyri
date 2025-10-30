@@ -1,4 +1,6 @@
 
+import type { FormDataConvertible } from '@inertiajs/core';
+
 export type PersonPositionType = 'Rector' | 'Vicerector' | 'Interventor' | 'Secretario' | 'Decano' | 'Vicedecano' | 'Jefe de Sección' | 'Administrativo' | 'Responsable' | 'Representante' | 'Investigador' | 'Docente' | 'Alumno' | 'Externo';
 
 export interface Person {
@@ -26,12 +28,15 @@ export interface PersonPosition {
     person: Person;
 }
 
-export interface PersonPositionFormData {
+export interface PersonPositionFormData extends Record<string, FormDataConvertible> {
     id?: number;
     person_id: number | string | null;
     position: string | '';
     active: boolean;
-    person: {
+    person: PersonPositionFormPerson;
+}
+
+export interface PersonPositionFormPerson extends Record<string, FormDataConvertible> {
         id?: number;
         name: string;
         surname: string;
@@ -40,5 +45,4 @@ export interface PersonPositionFormData {
         phone: string | null;
         address: string | null;
         nationality: number | string | null;
-    };
 }

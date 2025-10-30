@@ -2,10 +2,11 @@ import EntitiesLayout from '@/layouts/admin/entities/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Option } from '@/types';
 import { Head, usePage, router } from '@inertiajs/react';
-import PersonaRolForm from '@/components/forms/person-position-form';
+import PersonPositionForm from '@/components/forms/person-position-form';
 import { toast } from 'sonner';
+import { route } from 'ziggy-js';
 
-export default function CreatePersona() {
+export default function CreatePerson() {
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'PERSONAS',
@@ -29,7 +30,7 @@ export default function CreatePersona() {
       <EntitiesLayout title="Nueva Persona" description="Crea una nueva persona.">
         <div className="p-4">
           <h1 className="text-2xl font-bold mb-4">Agregar Nueva Persona</h1>
-          <PersonaRolForm
+          <PersonPositionForm
             persons={props.persons}
             positions={props.positions}
             errors={props.errors}
@@ -39,9 +40,6 @@ export default function CreatePersona() {
                   toast.error("Error al crear la persona", {
                     description: "Revisá los campos del formulario.",
                   })
-                },
-                onSuccess: () => {
-                  router.visit(route('entidades.person-position.index'))
                 },
               })
             }}

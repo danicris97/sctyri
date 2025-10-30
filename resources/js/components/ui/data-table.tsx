@@ -22,7 +22,7 @@ interface ActionLinks {
   delete?: string | (() => void)
 }
 
-interface DataTableProps<T extends Record<string, unknown>> {
+interface DataTableProps<T extends object> {
   title: string
   description?: string
   data: T[]
@@ -42,7 +42,7 @@ interface DataTableProps<T extends Record<string, unknown>> {
   enableRowClick?: boolean // Nueva prop para controlar el click en filas
 }
 
-export function DataTable<T extends Record<string, unknown>>({
+export function DataTable<T extends object>({
   title,
   description,
   data,
@@ -194,7 +194,7 @@ export function DataTable<T extends Record<string, unknown>>({
                       }}
                     >
                       <div className="break-words hyphens-auto">
-                        {col.render ? col.render(row) : String(row[col.accessor] ?? "")}
+                        {col.render ? col.render(row) : String((row as Record<string, unknown>)[col.accessor] ?? "")}
                       </div>
                     </TableCell>
                   ))}

@@ -17,18 +17,19 @@ export interface Agreement {
     id: number;
     uuid: string;
     type: AgreementType;
-    date_signature: Date;
-    date_end: Date | null;
-    date_renewal: Date | null;
-    duration: number | 0;
+    date_signature: string;
+    date_end: string | null;
+    date_renewal: string | null;
+    duration: number;
     type_renewal: AgreementRenewalType | null;
     international: boolean;
-    subject: string;
+    object: string | null;
+    summary: string | null;
     observations: string | null;
     status: AgreementStatus;
-    created_at: Date;
-    updated_at: Date;
-    deleted_at: Date | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
     name: string;
     title: string;
     formated_date_signature: string;
@@ -39,13 +40,14 @@ export interface Agreement {
 export interface AgreementRenewal {
     id: number;
     agreement_id: number;
-    start_date: Date;
-    end_date: Date | null;
-    duration: number | 0;
+    start_date: string;
+    end_date: string | null;
+    duration: number;
     observations: string | null;
-    created_at: Date;
-    updated_at: Date;
-    deleted_at: Date | null;
+    resolution_id?: number | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
     formated_start_date: string;
     formated_end_date: string;
 }
@@ -54,10 +56,52 @@ export interface AgreementCancellation {
     id: number;
     agreement_id: number;
     reason: string;
-    cancellation_date: Date;
-    resolution_id: number | null;
-    created_at: Date;
-    updated_at: Date;
-    deleted_at: Date | null;
+    cancellation_date: string;
+    resolution_id?: number | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
     formated_cancellation_date: string;
+}
+
+export interface AgreementRenewalFormData {
+    id?: number;
+    agreement_id?: number | null;
+    start_date?: string;
+    end_date?: string | null;
+    duration?: number | null;
+    observations?: string | null;
+    resolution_id?: number | null;
+}
+
+export interface AgreementCancellationFormData {
+    id?: number;
+    agreement_id?: number | null;
+    reason?: string;
+    cancellation_date?: string;
+    resolution_id?: number | null;
+}
+
+export interface AgreementFormData {
+    id?: number;
+    type?: AgreementType | string;
+    date_signature?: string;
+    duration?: number;
+    type_renewal?: AgreementRenewalType | string | null;
+    international?: boolean;
+    object?: string | null;
+    summary?: string | null;
+    observations?: string | null;
+    resolution_id?: number | null;
+    resolution?: {
+        id?: number;
+        number?: string;
+        date?: string;
+        type?: string;
+        link?: string;
+        file_id?: number;
+    } | null;
+    institutions?: number[];
+    dependencies?: number[];
+    person_positions?: number[];
 }

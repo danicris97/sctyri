@@ -66,3 +66,7 @@ export type Option = {
   label: string
 }
 
+type FlashToast = {
+  type: 'success' | 'error';
+  message: string;
+};
