@@ -1,14 +1,14 @@
-import { BreadcrumbItem } from '@/types'; // asegúrate que extiende de Inertia
+import { BreadcrumbItem, Option } from '@/types'; // asegúrate que extiende de Inertia
 import { Head, usePage, router } from '@inertiajs/react';
-import { FileText, Calendar, Globe, Landmark } from 'lucide-react';
-import { StatCard } from '@/components/stat-card';
+import { FileText, Calendar } from 'lucide-react';
+import { StatCard } from '@/components/ui/stat-card';
 import { DataTable } from '@/components/ui/data-table';
-import { type RenovacionConvenioType } from '@/schemas/renovacion-convenio-schema';
+import { AgreementRenewal } from '@/types/agreement';
 import AppLayout from '@/layouts/app-layout';
 import ConveniosLayout from '@/layouts/admin/agreements/layout';
 import { useState, useEffect } from 'react';
-import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
-import { GenericDialog } from '@/components/ui/generic-dialog';
+import { ConfirmDeleteDialog } from '@/components/dialogs/confirm-delete-dialog';
+import { GenericDialog } from '@/components/dialogs/generic-dialog';
 import { ComboBox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,21 +16,20 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import 'dayjs/locale/es';
 import { route } from "ziggy-js";
-import { SimpleDetailList, buildDetailItems } from '@/components/ui/simple-detail-list';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Renovaciones de Convenios',
-        href: route('convenios.renovaciones.index'),
+        href: route('agreement.agreement-renewals.index'),
     },
 ];
 
 // Estadísticas de ejemplo
 
 export default function RenovacionesConveniosIndex() {
-    const { renovaciones_convenios, search, sort, direction, toast: flashToast, tipos = [], convenios = [], expedientes = [], instituciones = [], dependencias = [], stats } = usePage().props as unknown as {
-      renovaciones_convenios: {
-        data: RenovacionConvenioType[];
+    const { agreementRenewals, search, sort, direction, toast: flashToast, types = [], agreements = [], files = [], institutions = [], dependencies = [], stats } = usePage().props as unknown as {
+      agreementRenewals: {
+        data: AgreementRenewal[];
         current_page: number;
         last_page: number;
       };
@@ -41,45 +40,43 @@ export default function RenovacionesConveniosIndex() {
         type: 'success' | 'error';
         message: string;
       };
-      tipos: { value: string; label: string }[];
-      convenios: { value: string; label: string }[];
-      expedientes: { value: string; label: string }[];
-      instituciones: { value: string; label: string }[];
-      dependencias: { value: string; label: string }[];
+      types: Option[];
+      agreements: Option[];
+      files: Option[];
+      institutions: Option[];
+      dependencies: Option[];
       stats: {
-        ultimas_renovaciones: 0;
-        total_renovaciones: 0;
-        total_instituciones: 0;
-        total_internacionales: 0;
-        ultima_fecha: string | null;
+        last_renewals: 0;
+        count_renewals: 0;
+        last_date: string | null;
       };
     };
 
     const columns = [
       {
         title: "Convenio",
-        accessor: "convenio_nombre",
+        accessor: "agreement_name",
         sortable: true,
         width: '180px',
         align: 'center' as const,
       },
       {
         title: "Fecha de Inicio",
-        accessor: "fecha_inicio_texto",
+        accessor: "formated_start_date",
         sortable: true,
         width: '180px',
         align: 'center' as const,
       },
       {
         title: "Duración",
-        accessor: "duracion",
+        accessor: "duration",
         sortable: true,
         width: '180px',
         align: 'center' as const,
       },
       {
         title: "Fecha de Fin",
-        accessor: "fecha_fin_texto",
+        accessor: "formated_closing_date",
         sortable: true,
         width: '180px',
         align: 'center' as const,
@@ -89,27 +86,27 @@ export default function RenovacionesConveniosIndex() {
     const statsList = [
         {
           title: "Ultimas renovaciones",
-          value: stats.ultimas_renovaciones.toString(),
+          value: stats.last_renewals.toString(),
           description: "Renovaciones de convenios en los ultimos 30 días",
           icon: FileText,
-          trend: (stats.total_renovaciones > 0 ? `${Math.round((stats.ultimas_renovaciones * 100) / stats.total_renovaciones)}% del total` : "0% del total"),
+          trend: (stats.count_renewals > 0 ? `${Math.round((stats.last_renewals * 100) / stats.count_renewals)}% del total` : "0% del total"),
         },
         {
           title: "Total de Renovaciones",
-          value: stats.total_renovaciones.toString(),
+          value: stats.count_renewals.toString(),
           description: "Renovaciones de convenios registradas en el sistema",
           icon: Calendar,
-          trend: (stats.total_renovaciones > 0 ? `${Math.round((stats.total_renovaciones * 100) / stats.total_renovaciones)}% del total` : "0% del total"),
+          trend: (stats.count_renewals > 0 ? `${Math.round((stats.count_renewals * 100) / stats.count_renewals)}% del total` : "0% del total"),
         },
         /*{
           title: "Total de Instituciones",
           value: stats.total_instituciones.toString(),
           description: "Instituciones registradas en el sistema",
           icon: Landmark,
-          trend: stats.ultima_fecha ? `Último registro: ${new Intl.DateTimeFormat("es-AR", {
+          trend: stats.last_date ? `Último registro: ${new Intl.DateTimeFormat("es-AR", {
                 dateStyle: "long",
                 timeStyle: "short",
-              }).format(new Date(stats.ultima_fecha))}`
+              }).format(new Date(stats.last_date))}`
             : "Sin registros",
         },
         {
@@ -121,17 +118,16 @@ export default function RenovacionesConveniosIndex() {
         },*/
     ]
 
-    const [renovacionConvenioToShow, setRenovacionConvenioToShow] = useState<RenovacionConvenioType | null>(null);
-    const [renovacionConvenioToDelete, setRenovacionConvenioToDelete] = useState<RenovacionConvenioType | null>(null);
+    const [agreementRenewalToDelete, setAgreementRenewalToDelete] = useState<AgreementRenewal | null>(null);
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState({
-      fecha_desde: '',
-      fecha_hasta: '',
-      tipo_renovacion: '',
-      convenio_id: '',
-      expediente_id: '',
-      institucion_id: '',
-      dependencia_unsa_id: '',
+      date_since: '',
+      date_until: '',
+      type_renewal: '',
+      agreement_id: '',
+      file_id: '',
+      institution_id: '',
+      dependency_id: '',
     });
 
     useEffect(() => {
@@ -155,13 +151,13 @@ export default function RenovacionesConveniosIndex() {
                 <div className="flex h-full flex-grow flex-col gap-4 rounded-xl p-4 overflow-x-auto">
                   <DataTable
                     title="Listado de Renovaciones de Convenios"
-                    data={renovaciones_convenios.data}
-                    totalItems={renovaciones_convenios.data.length}
+                    data={agreementRenewals.data}
+                    totalItems={agreementRenewals.data.length}
                     columns={columns}
-                    currentPage={renovaciones_convenios.current_page}
-                    totalPages={renovaciones_convenios.last_page}
+                    currentPage={agreementRenewals.current_page}
+                    totalPages={agreementRenewals.last_page}
                     onPageChange={(page) => {
-                      router.get(route('convenios.renovaciones.index'), {
+                      router.get(route('agreement.agreement-renewals.index'), {
                         page,
                         search: search, // este lo traés de props
                         sort,
@@ -174,7 +170,7 @@ export default function RenovacionesConveniosIndex() {
                     }}
 
                     onSort={(column, direction) => {
-                      router.get(route('convenios.renovaciones.index'), {
+                      router.get(route('agreement.agreement-renewals.index'), {
                         sort: column,
                         direction,
                         search: search, // también lo pasás
@@ -187,100 +183,21 @@ export default function RenovacionesConveniosIndex() {
                     }}
                     defaultSort={{ column: 'created_at', direction: 'desc' }}
                     onSearch={(value) => {
-                      router.get(route('convenios.renovaciones.index'), { search: value, ...filters }, {
+                      router.get(route('agreement.agreement-renewals.index'), { search: value, ...filters }, {
                         preserveState: true,
                         replace: true,
                       });
                     }}
-                    onNew={() => router.get(route('convenios.renovaciones.create'))}
+                    onNew={() => router.get(route('agreement.agreement-renewals.create'))}
                     onOpenFilter={() => setShowFilters(true)}
                     actionLinks={(row) => ({
-                      view: () => setRenovacionConvenioToShow(row),
-                      edit: route('convenios.renovaciones.edit', { renovacionConvenio: row.id }),
-                      delete: () => setRenovacionConvenioToDelete(row),
+                      view: () => route('agreement.agreement-renewals.show', { agreementRenewal: row.id }),
+                      edit: route('agreement.agreement-renewals.edit', { agreementRenewal: row.id }),
+                      delete: () => setAgreementRenewalToDelete(row),
                     })}
                   />
                 </div>
             </ConveniosLayout>
-
-            <GenericDialog
-              open={!!renovacionConvenioToShow}
-              onClose={() => setRenovacionConvenioToShow(null)}
-              title="Detalles de la renovacion de convenio"
-              description="Informacion completa de la renovacion de convenio seleccionada"
-              footer={
-                <Button
-                  className="bg-[#0e3b64] text-white hover:bg-[#3e7fca]"
-                  onClick={() => {
-                    if (!renovacionConvenioToShow) return;
-                    router.get(route('convenios.renovaciones.edit', { renovacionConvenio: renovacionConvenioToShow.id }));
-                  }}
-                >
-                  Editar
-                </Button>
-              }
-            >
-              <SimpleDetailList
-                items={buildDetailItems(renovacionConvenioToShow ?? {}, [
-                  {
-                    key: 'convenio_nombre',
-                    label: 'Convenio',
-                    hideIfEmpty: true,
-                    transform: () => renovacionConvenioToShow?.convenio_nombre ?? '',
-                  },
-                  {
-                    key: 'fecha_inicio',
-                    label: 'Fecha de Inicio',
-                    hideIfEmpty: true,
-                    transform: () => renovacionConvenioToShow?.fecha_inicio_texto ?? '',
-                  },
-                  {
-                    key: 'fecha_fin',
-                    label: 'Fecha de Fin',
-                    hideIfEmpty: true,
-                    transform: () => renovacionConvenioToShow?.fecha_fin_texto ?? '',
-                  },
-                  {
-                    key: 'duracion',
-                    label: 'Duracion',
-                    hideIfEmpty: true,
-                    transform: () => renovacionConvenioToShow?.duracion ?? '',
-                  },
-                  {
-                    key: 'observaciones',
-                    label: 'Observaciones',
-                    hideIfEmpty: true,
-                    transform: () => renovacionConvenioToShow?.observaciones ?? '',
-                  },
-                  {
-                    key: 'tipo_renovacion',
-                    label: 'Tipo de Renovacion',
-                    hideIfEmpty: true,
-                    transform: () => renovacionConvenioToShow?.convenio.tipo_renovacion ?? '',
-                  },
-                  {
-                    key: 'resolucion_texto',
-                    label: 'Resolución',
-                    hideIfEmpty: true,
-                    transform: () => renovacionConvenioToShow?.resolucion_texto ?? '',
-                  },
-                  {
-                    key: 'expediente_texto',
-                    label: 'Expediente',
-                    hideIfEmpty: true,
-                    transform: () => renovacionConvenioToShow?.expediente_texto ?? '',
-                  },
-                  {
-                    key: 'link',
-                    isLink: true,
-                    label: 'Link',
-                    hideIfEmpty: true,
-                    transform: () => renovacionConvenioToShow?.resolucion?.link ?? '',
-                    hrefTransform: (v) => (v ? String(v) : undefined),
-                  }
-                ])}
-              />
-            </GenericDialog>
 
             <GenericDialog
               open={showFilters}
@@ -293,7 +210,7 @@ export default function RenovacionesConveniosIndex() {
                     variant="outline"
                     onClick={() => {
                       // Limpia los filtros reiniciando la página sin query params
-                      router.get(route('convenios.renovaciones.index'), { ...filters }, { preserveState: true });
+                      router.get(route('agreement.agreement-renewals.index'), { ...filters }, { preserveState: true });
                       setShowFilters(false);
                     }}
                   >
@@ -303,14 +220,14 @@ export default function RenovacionesConveniosIndex() {
                   <Button
                     className="bg-[#0e3b64] text-white hover:bg-[#3e7fca]"
                     onClick={() => {
-                      router.get(route('convenios.renovaciones.index'), {
-                        fecha_desde: filters.fecha_desde,
-                        fecha_hasta: filters.fecha_hasta,
-                        tipo_renovacion: filters.tipo_renovacion,
-                        convenio_id: filters.convenio_id,
-                        expediente_id: filters.expediente_id,
-                        institucion_id: filters.institucion_id,
-                        dependencia_unsa_id: filters.dependencia_unsa_id,
+                      router.get(route('agreement.agreement-renewals.index'), {
+                        date_since: filters.date_since,
+                        date_until: filters.date_until,
+                        type_renewal: filters.type_renewal,
+                        agreement_id: filters.agreement_id,
+                        file_id: filters.file_id,
+                        institution_id: filters.institution_id,
+                        dependency_id: filters.dependency_id,
                       }, { preserveState: true });
                       setShowFilters(false);
                     }}
@@ -322,66 +239,66 @@ export default function RenovacionesConveniosIndex() {
             >
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="fecha_desde">Fecha desde</Label>
+                  <Label htmlFor="date_since">Fecha desde</Label>
                   <Input
-                    id="fecha_desde"
+                    id="date_since"
                     type="date"
-                    value={filters.fecha_desde}
-                    onChange={(e) => setFilters({ ...filters, fecha_desde: e.target.value })}
+                    value={filters.date_since}
+                    onChange={(e) => setFilters({ ...filters, date_since: e.target.value })}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="fecha_hasta">Fecha hasta</Label>
+                  <Label htmlFor="date_until">Fecha hasta</Label>
                   <Input
-                    id="fecha_hasta"
+                    id="date_until"
                     type="date"
-                    value={filters.fecha_hasta}
-                    onChange={(e) => setFilters({ ...filters, fecha_hasta: e.target.value })}
+                    value={filters.date_until}
+                    onChange={(e) => setFilters({ ...filters, date_until: e.target.value })}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="tipo_renovacion">Tipo de renovación</Label>
+                  <Label htmlFor="type_renewal">Tipo de renovación</Label>
                   <ComboBox
-                    options={tipos}
-                    value={filters.tipo_renovacion}
-                    onChange={(val) => setFilters({ ...filters, tipo_renovacion: val ?? '' })}
+                    options={types}
+                    value={filters.type_renewal}
+                    onChange={(val) => setFilters({ ...filters, type_renewal: val ?? '' })}
                     placeholder="Seleccione un tipo"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="convenio_id">Convenio</Label>
+                  <Label htmlFor="agreement_id">Convenio</Label>
                   <ComboBox
-                    options={convenios}
-                    value={filters.convenio_id}
-                    onChange={(val) => setFilters({ ...filters, convenio_id: val ?? '' })}
+                    options={agreements}
+                    value={filters.agreement_id}
+                    onChange={(val) => setFilters({ ...filters, agreement_id: val ?? '' })}
                     placeholder="Seleccione un convenio"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="expediente_id">Expediente</Label>
+                  <Label htmlFor="file_id">Expediente</Label>
                   <ComboBox
-                    options={expedientes.map((e) => ({
+                    options={files.map((e) => ({
                       ...e,
                       value: String(e.value),
                     }))}
-                    value={filters.expediente_id ? String(filters.expediente_id) : ""}
+                    value={filters.file_id ? String(filters.file_id) : ""}
                     onChange={(val) => {
-                      setFilters({ ...filters, expediente_id: val ?? '' })
+                      setFilters({ ...filters, file_id: val ?? '' })
                     }}
                     placeholder="Seleccione un expediente"
                     className="w-full"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="institucion_id">Institución</Label>
+                  <Label htmlFor="institution_id">Institución</Label>
                   <ComboBox
-                    options={instituciones.map((inst) => ({
+                    options={institutions.map((inst) => ({
                       ...inst,
                       value: String(inst.value),
                     }))}
-                    value={filters.institucion_id ? String(filters.institucion_id) : ""}
+                    value={filters.institution_id ? String(filters.institution_id) : ""}
                     onChange={(val) => {
-                      setFilters({ ...filters, institucion_id: val ?? '' })
+                      setFilters({ ...filters, institution_id: val ?? '' })
                     }}
                     placeholder="Seleccione una institución"
                     className="w-full"
@@ -389,15 +306,15 @@ export default function RenovacionesConveniosIndex() {
                 </div>
 
                 <div>
-                  <Label htmlFor="dependencia_unsa_id">Unidad Académica</Label>
+                  <Label htmlFor="dependency_id">Unidad Académica</Label>
                   <ComboBox
-                    options={dependencias.map((d) => ({
+                    options={dependencies.map((d) => ({
                       ...d,
                       value: String(d.value),
                     }))}
-                    value={filters.dependencia_unsa_id ? String(filters.dependencia_unsa_id) : ""}
+                    value={filters.dependency_id ? String(filters.dependency_id) : ""}
                     onChange={(val) => {
-                      setFilters({ ...filters, dependencia_unsa_id: val ?? '' })
+                      setFilters({ ...filters, dependency_id: val ?? '' })
                     }}
                     placeholder="Seleccione una unidad académica"
                     className="w-full"
@@ -407,18 +324,18 @@ export default function RenovacionesConveniosIndex() {
             </GenericDialog>
 
             <ConfirmDeleteDialog
-              open={!!renovacionConvenioToDelete}
+              open={!!agreementRenewalToDelete}
               onCancel={() => {
-                setRenovacionConvenioToDelete(null);
+                setAgreementRenewalToDelete(null);
               }}
               onConfirm={() => {
-                if (renovacionConvenioToDelete) {
-                  const id = renovacionConvenioToDelete.id;
-                  router.delete(route('convenios.renovaciones.destroy', id));
+                if (agreementRenewalToDelete) {
+                  const id = agreementRenewalToDelete.id;
+                  router.delete(route('agreement.agreement-renewals.destroy', id));
                 }
               }}
-              title="¿Eliminar renovacion de convenio?"
-              description={`¿Estás seguro que deseas eliminar la renovacion de convenio ${renovacionConvenioToDelete?.convenio_nombre + ' ' + renovacionConvenioToDelete?.fecha_inicio_texto || ''}? Esta acción no se puede deshacer.`}
+              title="¿Eliminar renovación de convenio?"
+              description={`¿Estás seguro que deseas eliminar la renovación de convenio ${agreementRenewalToDelete?.agreement_name + ' ' + agreementRenewalToDelete?.formated_start_date || ''}? Esta acción no se puede deshacer.`}
             />
 
         </AppLayout>

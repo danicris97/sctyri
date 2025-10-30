@@ -2,15 +2,17 @@ import DocumentosLayout from '@/layouts/admin/documents/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import ResolucionForm from '@/components/forms/resolution-form';
-import { type ResolucionType } from '@/schemas/resolucion-schema';
+import ResolutionForm from '@/components/forms/resolution-form';
+import { Resolution } from '@/types/resolution';
+import { Option } from '@/types';
+import { route } from "ziggy-js";
 
-export default function EditResolucion() {
-  const { resolucion, tipos, expedientes, resolucion_nombre } = usePage().props as unknown as { 
-    resolucion: ResolucionType;
-    tipos: { value: string; label: string }[];
-    expedientes: { value: string; label: string }[];
-    resolucion_nombre: string;
+export default function EditResolution() {
+  const { resolution, types, files, resolution_name } = usePage().props as unknown as { 
+    resolution: Resolution;
+    types: Option[];
+    files: Option[];
+    resolution_name: string;
   };
 
   const breadcrumbs: BreadcrumbItem[] = [
@@ -19,8 +21,8 @@ export default function EditResolucion() {
       href: route('documentos.resoluciones.index'),
     },
     {
-      title: `Editar: ${resolucion_nombre}`,
-      href: route('documentos.resoluciones.edit', resolucion.id),
+      title: `Editar: ${resolution_name}`,
+      href: route('documentos.resoluciones.edit', resolution.id),
     },
   ];
 
@@ -30,7 +32,7 @@ export default function EditResolucion() {
       <DocumentosLayout title="Editar Resolución" description="Edita una resolución existente.">
         <div className="p-4">
           <h1 className="text-2xl font-bold mb-4">Editar Resolución</h1>
-          <ResolucionForm resolucion={resolucion} resoluciones_tipos={tipos} expedientes={expedientes} />
+          <ResolutionForm resolution={resolution} types={types} files={files} fileId={resolution.file_id ?? undefined} />
         </div>
       </DocumentosLayout>
     </AppLayout>

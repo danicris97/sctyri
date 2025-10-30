@@ -1,26 +1,27 @@
 import EntidadesLayout from '@/layouts/admin/entities/layout';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, DropdownOption } from '@/types';
+import { type BreadcrumbItem, Option } from '@/types';
 import { Head } from '@inertiajs/react';
-import DependenciaUnsaForm from '@/components/forms/dependency-form';
+import DependencyForm from '@/components/forms/dependency-form';
 import { usePage } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
-export default function CreateDependenciaUnsa() {
+export default function CreateDependency() {
   const breadcrumbs: BreadcrumbItem[] = [
     {
-      title: 'DEPENDENCIAS UNSa',
-      href: route('entidades.dependenciasUnsa.index'),
+      title: 'DEPENDENCIAS',
+      href: route('entidades.dependencies.index'),
     },
     {
-      title: 'Nueva Dependencia UNSa',
-      href: route('entidades.dependenciasUnsa.create'),
+      title: 'Nueva Dependencia',
+      href: route('entidades.dependencies.create'),
     },
   ];
 
   const { props } = usePage<{
-    tipos: DropdownOption[]
-    localidades: DropdownOption[]
-    dependencias_padre: DropdownOption[]
+    types: Option[]
+    localities: Option[]
+    patern_dependencies: Option[]
   }>();
 
   return (
@@ -29,7 +30,7 @@ export default function CreateDependenciaUnsa() {
       <EntidadesLayout title="Nueva Dependencia" description="Crea una nueva dependencia.">
         <div className="p-4">
           <h1 className="text-2xl font-bold mb-4">Agregar Nueva Dependencia</h1>
-          <DependenciaUnsaForm {...props} />
+          <DependencyForm {...props} />
         </div>
       </EntidadesLayout>
     </AppLayout>

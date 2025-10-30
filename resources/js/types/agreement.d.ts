@@ -50,6 +50,7 @@ export interface AgreementRenewal {
     deleted_at: string | null;
     formated_start_date: string;
     formated_end_date: string;
+    agreement_name: string;
 }
 
 export interface AgreementCancellation {

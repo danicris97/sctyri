@@ -1,20 +1,20 @@
 import DocumentosLayout from '@/layouts/admin/documents/layout';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, Option } from '@/types';
+import { FileMovement } from '@/types/file';
 import { Head, usePage } from '@inertiajs/react';
-import ExpedienteMovimientoForm from '@/components/forms/file-movement-form';
-import { type ExpedienteMovimientoType } from '@/schemas/expediente-movimiento-schema';
+import FileMovementForm from '@/components/forms/file-movement-form';
 import { route } from 'ziggy-js';
 
-type PageProps = {
-  movimiento: ExpedienteMovimientoType;
-  expedientes: { value: string; label: string }[];
-  dependencias: { value: string; label: string }[];
-  expediente_nombre: string;
+type EditMovementFileProps = {
+  file_movement: FileMovement;
+  files: Option[];
+  dependencies: Option[];
+  file_name: string;
 };
 
-export default function EditMovimiento() {
-  const { movimiento, expedientes, dependencias, expediente_nombre } = usePage().props as unknown as PageProps;
+export default function EditMovementFile() {
+  const { file_movement, files, dependencies, file_name } = usePage().props as unknown as EditMovementFileProps;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,8 +22,8 @@ export default function EditMovimiento() {
       href: route('documentos.movimientos.index'),
     },
     {
-      title: `Editar: ${expediente_nombre}`,
-      href: route('documentos.movimientos.edit', movimiento.id),
+      title: `Editar: ${file_name}`,
+      href: route('documentos.movimientos.edit', file_movement.id),
     },
   ];
 
@@ -33,11 +33,11 @@ export default function EditMovimiento() {
       <DocumentosLayout title="Editar Movimiento" description="Edita un movimiento existente.">
         <div className="p-4">
           <h1 className="mb-4 text-2xl font-bold">Editar Movimiento</h1>
-          <ExpedienteMovimientoForm
-            movimiento={movimiento}
-            expedientes={expedientes}
-            dependencias={dependencias}
-            hideExpedienteSelector
+          <FileMovementForm
+            file_movement={file_movement}
+            files={files}
+            dependencies={dependencies}
+            hideFileSelector
           />
         </div>
       </DocumentosLayout>

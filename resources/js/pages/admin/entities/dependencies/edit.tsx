@@ -1,28 +1,29 @@
 import EntidadesLayout from '@/layouts/admin/entities/layout';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, DropdownOption } from '@/types';
+import { type BreadcrumbItem, Option } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import DependenciaUnsaForm from '@/components/forms/dependency-form';
-import { type DependenciaUnsaType } from '@/schemas/dependencia-unsa-schema';
+import DependencyForm from '@/components/forms/dependency-form';
+import { Dependency } from '@/types/dependency';
+import { route } from 'ziggy-js';
 
-export default function EditDependenciaUnsa() {
+export default function EditDependency() {
   const { props } = usePage<{
-    tipos: DropdownOption[]
-    localidades: DropdownOption[]
-    dependencias_padre: DropdownOption[]
-    dependenciaUnsa?: DependenciaUnsaType
+    types: Option[]
+    localities: Option[]
+    patern_dependencies: Option[]
+    dependency?: Dependency
   }>();
 
-  const { dependenciaUnsa } = props;
+  const { dependency } = props;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
-      title: 'DEPENDENCIAS UNSa',
-      href: route('entidades.dependenciasUnsa.index'),
+      title: 'DEPENDENCIAS',
+      href: route('entidades.dependencies.index'),
     },
     {
-      title: `Editar: ${dependenciaUnsa?.nombre}`,
-      href: route('entidades.dependenciasUnsa.edit', dependenciaUnsa?.id),
+      title: `Editar: ${dependency?.name}`,
+      href: route('entidades.dependencies.edit', dependency?.id),
     },
   ];
 
@@ -32,7 +33,7 @@ export default function EditDependenciaUnsa() {
       <EntidadesLayout title="Editar Dependencia" description="Edita una dependencia del sistema.">
         <div className="p-4">
           <h1 className="text-2xl font-bold mb-4">Editar Dependencia</h1>
-          <DependenciaUnsaForm { ...props } />
+          <DependencyForm { ...props } />
         </div>
       </EntidadesLayout>
     </AppLayout>

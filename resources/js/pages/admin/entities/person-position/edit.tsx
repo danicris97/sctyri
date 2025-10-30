@@ -7,6 +7,7 @@ import { Option } from '@/types';
 import { PersonPosition } from '@/types/person';
 import { toast } from 'sonner';
 import { route } from 'ziggy-js';
+import type { RequestPayload } from '@inertiajs/core';
 
 export default function EditPerson() {
   const { personPosition } = usePage().props as unknown as { personPosition: PersonPosition };
@@ -36,7 +37,12 @@ export default function EditPerson() {
             positions={props.positions} 
             errors={props.errors} 
             onSubmit={(data) => {
-              router.put(route('entidades.person-position.update', personPosition.id), data, {
+              const payload: RequestPayload = {
+                ...data,
+                person: { ...data.person },
+              };
+
+              router.put(route('entidades.person-position.update', personPosition.id), payload, {
                 onError: (errors) => {
                   toast.error("Error al actualizar la persona", {
                     description: "Revisá los campos del formulario.",

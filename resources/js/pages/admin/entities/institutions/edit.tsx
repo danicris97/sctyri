@@ -1,29 +1,30 @@
 import EntidadesLayout from '@/layouts/admin/entities/layout';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, DropdownOption } from '@/types';
+import { type BreadcrumbItem, Option } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import InstitucionForm from '@/components/forms/institution-form';
-import { type InstitucionType } from '@/schemas/institucion-schema';
+import InstitutionForm from '@/components/forms/institution-form';
+import { Institution } from '@/types/institution';
+import { route } from "ziggy-js";
 
 export default function EditInstitucion() {
   const { props } = usePage<{
-    tipos: DropdownOption[]
-    localidades: DropdownOption[]
-    provincias : DropdownOption[]
-    paises : DropdownOption[]
-    institucion: InstitucionType
+    types: Option[]
+    localities: Option[]
+    provinces : Option[]
+    countries : Option[]
+    institution: Institution
   }>();
 
-  const { institucion } = props;
+  const { institution } = props;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'INSTITUCIONES',
-      href: route('entidades.instituciones.index'),
+      href: route('entities.institutions.index'),
     },
     {
-      title: `Editar: ${institucion.nombre}`,
-      href: route('entidades.instituciones.edit', institucion.id),
+      title: `Editar: ${institution.name}`,
+      href: route('entities.institutions.edit', institution.id),
     },
   ];
 
@@ -33,7 +34,7 @@ export default function EditInstitucion() {
       <EntidadesLayout title="Editar Institución" description="Edita una institución existente en el sistema.">
         <div className="p-4">
           <h1 className="text-2xl font-bold mb-4">Editar Institución</h1>
-          <InstitucionForm { ...props } />
+          <InstitutionForm { ...props } />
         </div>
       </EntidadesLayout>
     </AppLayout>

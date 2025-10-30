@@ -1,31 +1,32 @@
 import DocumentosLayout from '@/layouts/admin/documents/layout';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, DropdownOption } from '@/types';
+import { type BreadcrumbItem, Option } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import ExpedienteForm from '@/components/forms/file-form';
-import { type ExpedienteType } from '@/schemas/expediente-schema';
+import FileForm from '@/components/forms/file-form';
+import { File } from '@/types/file';
+import { route } from "ziggy-js";
 
-export default function EditExpediente() {
+export default function EditFile() {
   const { props } = usePage<{ 
-    tipos: DropdownOption[], 
-    dependencias: DropdownOption[],
-    instituciones: DropdownOption[],
-    personas: DropdownOption[],
-    roles: DropdownOption[],
-    personas_roles: DropdownOption[],
-    tipos_instituciones: DropdownOption[],
-    tipos_dependencias: DropdownOption[],
-    expediente: ExpedienteType,
+    types: Option[], 
+    dependencies: Option[],
+    institutions: Option[],
+    persons: Option[],
+    positions: Option[],
+    person_positions: Option[],
+    types_institutions: Option[],
+    types_dependencies: Option[],
+    file: File,
   }>();
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'EXPEDIENTES',
-      href: route('documentos.expedientes.index'),
+      href: route('documents.files.index'),
     },
     {
-      title: `Editar: ${props.expediente.numero}`,
-      href: route('documentos.expedientes.edit', props.expediente.id),
+      title: `Editar: ${props.file.number}`,
+      href: route('documents.files.edit', props.file.id),
     },
   ];
 
@@ -35,7 +36,7 @@ export default function EditExpediente() {
       <DocumentosLayout title="Editar Expediente" description="Edita un expediente existente.">
         <div className="p-4">
           <h1 className="text-2xl font-bold mb-4">Editar Expediente</h1>
-          <ExpedienteForm {...props}/>
+          <FileForm {...props}/>
         </div>
       </DocumentosLayout>
     </AppLayout>

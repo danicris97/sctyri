@@ -4,33 +4,33 @@ import { DataTable } from '@/components/ui/data-table';
 import AppLayout from '@/layouts/app-layout';
 import DocumentosLayout from '@/layouts/admin/documents/layout';
 import { useState, useEffect, useRef } from 'react';
-import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
-import { GenericDialog } from '@/components/ui/generic-dialog';
+import { ConfirmDeleteDialog } from '@/components/dialogs/confirm-delete-dialog';
+import { GenericDialog } from '@/components/dialogs/generic-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ComboBox } from '@/components/ui/combobox';
 import { toast } from 'sonner';
-import { ResolucionFullType } from '@/schemas/resolucion-schema';
-import { SimpleDetailList, buildDetailItems } from "@/components/ui/simple-detail-list";
+import { Option } from '@/types';
+import { Resolution } from '@/types/resolution';
 import { route } from "ziggy-js";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Resoluciones',
-        href: route('documentos.resoluciones.index'),
+        href: route('documents.resolutions.index'),
     },
 ];
 
-export default function ResolucionesIndex() {
-    const { resoluciones, expedientes = [], tipos = [], search, sort, direction, toast: flashToast } = usePage().props as unknown as {
-        resoluciones: {
-            data: ResolucionFullType[];
+export default function ResolutionsIndex() {
+    const { resolutions, files = [], types = [], search, sort, direction, toast: flashToast } = usePage().props as unknown as {
+        resolutions: {
+            data: Resolution[];
             current_page: number;
             last_page: number;
         };
-        expedientes: { value: number; label: string }[];
-        tipos: { value: number; label: string }[];
+        files: Option[];
+        types: Option[];
         search?: string;
         sort?: string;
         direction?: 'asc' | 'desc';
@@ -43,28 +43,28 @@ export default function ResolucionesIndex() {
     const columns = [
         {
           title: "Número",
-          accessor: "numero",
+          accessor: "number",
           sortable: true,
           width: '180px',
           align: 'center' as const,
         },
         {
           title: "Fecha",
-          accessor: "fecha",
+          accessor: "date",
           sortable: true,
           width: '180px',
           align: 'center' as const,
         },
         {
           title: "Tipo",
-          accessor: "tipo",
+          accessor: "type",
           sortable: true,
           width: '180px',
           align: 'center' as const,
         },
         {
           title: "Expediente",
-          accessor: "expediente",
+          accessor: "file",
           sortable: false,
           width: '180px',
           align: 'center' as const,
@@ -78,14 +78,13 @@ export default function ResolucionesIndex() {
         },
     ];
 
-    const [resolucionToShow, setResolucionToShow] = useState<ResolucionFullType | null>(null);
-    const [resolucionToDelete, setResolucionToDelete] = useState<ResolucionFullType | null>(null);
+    const [resolutionToDelete, setResolutionToDelete] = useState<Resolution | null>(null);
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState({
-        tipo: '',
-        expediente_id: '',
-        fecha_desde: '',
-        fecha_hasta: '',
+        type: '',
+        file_id: '',
+        date_since: '',
+        date_until: '',
     });
     const dialogContentRef = useRef<HTMLDivElement>(null);
 
@@ -104,13 +103,13 @@ export default function ResolucionesIndex() {
                 <div className="flex h-full flex-grow flex-col gap-4 rounded-xl p-4 overflow-x-auto">
                     <DataTable
                         title="Listado de Resoluciones"
-                        data={resoluciones.data}
-                        totalItems={resoluciones.data.length}
+                        data={resolutions.data}
+                        totalItems={resolutions.data.length}
                         columns={columns}
-                        currentPage={resoluciones.current_page}
-                        totalPages={resoluciones.last_page}
+                        currentPage={resolutions.current_page}
+                        totalPages={resolutions.last_page}
                         onPageChange={(page) => {
-                            router.get(route('documentos.resoluciones.index'), {
+                            router.get(route('documents.resolutions.index'), {
                                 page,
                                 search,
                                 sort,
@@ -121,7 +120,7 @@ export default function ResolucionesIndex() {
                             });
                         }}
                         onSort={(column, direction) => {
-                            router.get(route('documentos.resoluciones.index'), {
+                            router.get(route('documents.resolutions.index'), {
                                 sort: column,
                                 direction,
                                 search,
@@ -133,45 +132,23 @@ export default function ResolucionesIndex() {
                         }}
                         defaultSort={{ column: 'created_at', direction: 'desc' }}
                         onSearch={(value) => {
-                            router.get(route('documentos.resoluciones.index'), { search: value }, {
+                            router.get(route('documents.resolutions.index'), { search: value }, {
                                 preserveState: true,
                                 replace: true,
                             });
                         }}
-                        onNew={() => router.get(route('documentos.resoluciones.create'))}
+                        onNew={() => router.get(route('documents.resolutions.create'))}
                         onOpenFilter={() => {
                             setShowFilters(true);
                         }}
                         actionLinks={(row) => ({
-                            view: () => setResolucionToShow(row),
-                            edit: route('documentos.resoluciones.edit', row.id),
-                            delete: () => setResolucionToDelete(row),
+                            view: () => route('documents.resolutions.show', row.id),
+                            edit: route('documents.resolutions.edit', row.id),
+                            delete: () => setResolutionToDelete(row),
                         })}
                     />
                 </div>
             </DocumentosLayout>
-
-            <GenericDialog
-                open={!!resolucionToShow}
-                onClose={() => setResolucionToShow(null)}
-                title="Detalles de la Resolución"
-                description="Información completa de la resolución seleccionada"
-                footer={
-                    <Button className="bg-[#0e3b64] text-white hover:bg-[#3e7fca]" onClick={() => router.get(route('documentos.resoluciones.edit', resolucionToShow?.id))}>
-                        Editar
-                    </Button>
-                }
-            >
-                <SimpleDetailList
-                    items={buildDetailItems(resolucionToShow ?? {}, [
-                    { key: "numero", label: "Numero", hideIfEmpty: true },
-                    { key: "fecha", label: "Fecha", hideIfEmpty: true },
-                    { key: "tipo", label: "Tipo", hideIfEmpty: true },
-                    { key: "expediente", label: "Expediente", hideIfEmpty: true },
-                    { key: "link", isLink: true, label: "Link", hideIfEmpty: true, transform: (v) => String(v ?? ""),hrefTransform: (v) => (v ? String(v) : undefined)},
-                ])}
-                />
-            </GenericDialog>
 
             <GenericDialog
                 open={showFilters}
@@ -183,7 +160,7 @@ export default function ResolucionesIndex() {
                         <Button
                             variant="outline"
                             onClick={() => {
-                                router.get(route('documentos.resoluciones.index'));
+                                router.get(route('documents.resolutions.index'));
                                 setShowFilters(false);
                             }}
                         >
@@ -193,11 +170,11 @@ export default function ResolucionesIndex() {
                         <Button
                             className="bg-[#0e3b64] text-white hover:bg-[#3e7fca]"
                             onClick={() => {
-                                router.get(route('documentos.resoluciones.index'), {
-                                    tipo: filters.tipo,
-                                    expediente_id: filters.expediente_id,
-                                    fecha_desde: filters.fecha_desde,
-                                    fecha_hasta: filters.fecha_hasta,
+                                router.get(route('documents.resolutions.index'), {
+                                    type: filters.type,
+                                    file_id: filters.file_id,
+                                    date_since: filters.date_since,
+                                    date_until: filters.date_until,
                                 }, { preserveState: true });
                                 setShowFilters(false);
                             }}
@@ -209,41 +186,41 @@ export default function ResolucionesIndex() {
             >
                 <div className="space-y-4" ref={dialogContentRef}>
                     <div>
-                        <Label htmlFor="tipo">Tipo</Label>
+                        <Label htmlFor="type">Tipo</Label>
                         <ComboBox
-                            options={tipos}
-                            value={filters.tipo}
-                            onChange={(val) => setFilters({ ...filters, tipo: val ?? '' })}
+                            options={types}
+                            value={filters.type}
+                            onChange={(val) => setFilters({ ...filters, type: val ?? '' })}
                             placeholder="Seleccione un tipo"
                         />
                     </div>
                     <div>
-                        <Label htmlFor="expediente_id">Expediente</Label>
+                        <Label htmlFor="file_id">Expediente</Label>
                         <ComboBox
-                            options={expedientes}
-                            value={filters.expediente_id}
-                            onChange={(val) => setFilters({ ...filters, expediente_id: val ?? '' })}
+                            options={files}
+                            value={filters.file_id}
+                            onChange={(val) => setFilters({ ...filters, file_id: val ?? '' })}
                             placeholder="Seleccione un expediente"
                         />
                     </div>
                             <div className="grid grid-cols-2 gap-2">
                     <div>
-                        <Label htmlFor="fecha_desde">Fecha desde</Label>
+                        <Label htmlFor="date_since">Fecha desde</Label>
                         <Input
-                        id="fecha_desde"
+                        id="date_since"
                         type="date"
-                        value={filters.fecha_desde}
-                        onChange={(e) => setFilters({ ...filters, fecha_desde: e.target.value })}
+                        value={filters.date_since}
+                        onChange={(e) => setFilters({ ...filters, date_since: e.target.value })}
                     />
                     </div>
 
                     <div>
-                        <Label htmlFor="fecha_hasta">Fecha hasta</Label>
+                        <Label htmlFor="date_until">Fecha hasta</Label>
                         <Input
-                        id="fecha_hasta"
+                        id="date_until"
                         type="date"
-                        value={filters.fecha_hasta}
-                        onChange={(e) => setFilters({ ...filters, fecha_hasta: e.target.value })}
+                        value={filters.date_until}
+                        onChange={(e) => setFilters({ ...filters, date_until: e.target.value })}
                         />
                     </div>
                     </div>
@@ -251,18 +228,18 @@ export default function ResolucionesIndex() {
             </GenericDialog>
 
             <ConfirmDeleteDialog
-                open={!!resolucionToDelete}
+                open={!!resolutionToDelete}
                 onCancel={() => {
-                    setResolucionToDelete(null);
+                    setResolutionToDelete(null);
                 }}
                 onConfirm={() => {
-                    if (resolucionToDelete) {
-                        const id = resolucionToDelete.id;
-                        router.delete(route('documentos.resoluciones.destroy', id));
+                    if (resolutionToDelete) {
+                        const id = resolutionToDelete.id;
+                        router.delete(route('documents.resolutions.destroy', id));
                     }
                 }}
                 title="¿Eliminar resolución?"
-                description={`¿Estás seguro que deseas eliminar la resolución ${resolucionToDelete?.numero || ''}? Esta acción no se puede deshacer.`}
+                description={`¿Estás seguro que deseas eliminar la resolución ${resolutionToDelete?.number || ''}? Esta acción no se puede deshacer.`}
             />
         </AppLayout>
     );

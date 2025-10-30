@@ -2,23 +2,25 @@ import DocumentosLayout from '@/layouts/admin/documents/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import ResolucionForm from '@/components/forms/resolution-form';
+import ResolutionForm from '@/components/forms/resolution-form';
+import { route } from "ziggy-js";
+import { Option } from '@/types';
 
-export default function CreateResolucion() {
-  const { tipos, expedientes, expediente } = usePage().props as unknown as {
-    tipos: { value: string; label: string }[];
-    expedientes: { value: string; label: string }[];
-    expediente?: number;
+export default function CreateResolution() {
+  const { types, files, fileId } = usePage().props as unknown as {
+    types: Option[];
+    files: Option[];
+    fileId?: number;
   };
   
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'RESOLUCIONES',
-      href: route('documentos.resoluciones.index'),
+      href: route('documents.resolutions.index'),
     },
     {
       title: 'Nueva Resolución',
-      href: route('documentos.resoluciones.create'),
+      href: route('documents.resolutions.create'),
     },
   ];
 
@@ -30,7 +32,7 @@ export default function CreateResolucion() {
         <div className="p-4">
           <h1 className="text-2xl font-bold mb-4">Agregar Nueva Resolución</h1>
           {/* Formulario de creación de resolución */}
-          <ResolucionForm resoluciones_tipos={tipos} expedientes={expedientes} expedienteId={expediente} />
+          <ResolutionForm types={types} files={files} fileId={fileId} />
         </div>
       </DocumentosLayout>
     </AppLayout>

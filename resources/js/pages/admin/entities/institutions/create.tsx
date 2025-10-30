@@ -1,22 +1,26 @@
 import EntidadesLayout from '@/layouts/admin/entities/layout';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, DropdownOption } from '@/types';
+import { type BreadcrumbItem, Option } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import InstitucionForm from '@/components/forms/institution-form';
+import InstitutionForm from '@/components/forms/institution-form';
+import { route } from "ziggy-js";
 
 export default function CreateInstitucion() {
   const { props } = usePage<{
-    tipos: DropdownOption[]
+    types: Option[],
+    localities: Option[],
+    provinces: Option[],
+    countries: Option[],
   }>();
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'INSTITUCIONES',
-      href: route('entidades.instituciones.index'),
+      href: route('entities.institutions.index'),
     },
     {
       title: 'Nueva Institución',
-      href: route('entidades.instituciones.create'),
+      href: route('entities.institutions.create'),
     },
   ];
 
@@ -28,7 +32,7 @@ export default function CreateInstitucion() {
         <div className="p-4">
           <h1 className="text-2xl font-bold mb-4">Agregar Nueva Institución</h1>
           {/* Formulario de creación de institución */}
-          <InstitucionForm { ...props } />
+          <InstitutionForm { ...props } />
         </div>
       </EntidadesLayout>
     </AppLayout>

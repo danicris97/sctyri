@@ -1,33 +1,34 @@
 import ConveniosLayout from '@/layouts/admin/agreements/layout';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, DropdownOption } from '@/types';
+import { type BreadcrumbItem, Option } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import RenovacionConvenioForm from '@/components/forms/agreement-renewal-form';
-import { type RenovacionConvenioType } from '@/schemas/renovacion-convenio-schema';
+import AgreementRenewalForm from '@/components/forms/agreement-renewal-form';
+import {AgreementRenewal } from '@/types/agreement';
+import { route } from "ziggy-js";
 
 export default function EditRenovacionConvenio() {
   const { props } = usePage<{
-    renovacionConvenio?: RenovacionConvenioType;
-    convenios: DropdownOption[];
+    agreementRenewal?: AgreementRenewal;
+    convenios: Option[];
     convenio_nombre: string;
-    resoluciones: { value: string; label: string }[];
-    resoluciones_tipos: { value: string; label: string }[];
-    expedientes: { value: string; label: string }[];
+    resoluciones: Option[];
+    resoluciones_tipos: Option[];
+    expedientes: Option[];
   }>();
 
-  const { renovacionConvenio, convenio_nombre } = props;
+  const { agreementRenewal, convenio_nombre } = props;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'RENOVACIONES DE CONVENIOS',
-      href: route('convenios.renovaciones.index'),
+      href: route('agreement.renovaciones.index'),
     },
   ];
 
-  if (renovacionConvenio?.id) {
+  if (agreementRenewal?.id) {
     breadcrumbs.push({
       title: `Editar: ${convenio_nombre}`,
-      href: route('convenios.renovaciones.edit', { renovacionConvenio: renovacionConvenio.id }),
+      href: route('agreement.renovaciones.edit', { agreementRenewal: agreementRenewal.id }),
     });
   }
 

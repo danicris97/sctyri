@@ -5,6 +5,7 @@ import { Head, usePage, router } from '@inertiajs/react';
 import PersonPositionForm from '@/components/forms/person-position-form';
 import { toast } from 'sonner';
 import { route } from 'ziggy-js';
+import type { RequestPayload } from '@inertiajs/core';
 
 export default function CreatePerson() {
   const breadcrumbs: BreadcrumbItem[] = [
@@ -35,7 +36,12 @@ export default function CreatePerson() {
             positions={props.positions}
             errors={props.errors}
             onSubmit={(data) => {
-              router.post(route('entidades.person-position.store'), data, {
+              const payload: RequestPayload = {
+                ...data,
+                person: { ...data.person },
+              };
+
+              router.post(route('entidades.person-position.store'), payload, {
                 onError: (errors) => {
                   toast.error("Error al crear la persona", {
                     description: "Revisá los campos del formulario.",

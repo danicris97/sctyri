@@ -10,6 +10,9 @@ import { Option } from '@/types';
 type InstitutionFormProps = {
   institution?: Institution;
   types: Option[];
+  localities: Option[];
+  provinces: Option[];
+  countries: Option[];
   onSuccess?: (institution: Institution) => void;
   onSubmit?: (data: InstitutionFormData) => Promise<void> | void;
 };
@@ -17,6 +20,9 @@ type InstitutionFormProps = {
 export default function InstitutionForm({ 
   institution, 
   types = [], 
+  localities = [],
+  provinces = [],
+  countries = [],
   onSuccess,
   onSubmit,
 }: InstitutionFormProps) {

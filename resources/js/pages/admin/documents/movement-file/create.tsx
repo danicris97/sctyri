@@ -1,39 +1,39 @@
-import DocumentosLayout from '@/layouts/admin/documents/layout';
+import DocumentsLayout from '@/layouts/admin/documents/layout';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, Option } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import ExpedienteMovimientoForm from '@/components/forms/file-movement-form';
+import FileMovementForm from '@/components/forms/file-movement-form';
 import { route } from 'ziggy-js';
 
-type PageProps = {
-  expedientes: { value: string; label: string }[];
-  dependencias: { value: string; label: string }[];
-  expediente?: number;
+type MovementFileCreateProps = {
+  files: Option[];
+  dependencies: Option[];
+  file?: number;
 };
 
-export default function CreateMovimiento() {
-  const { expedientes, dependencias, expediente } = usePage().props as unknown as PageProps;
+export default function CreateMovementFile() {
+  const { files, dependencies, file } = usePage().props as unknown as MovementFileCreateProps;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'MOVIMIENTOS',
-      href: route('documentos.movimientos.index'),
+      href: route('documents.movements.index'),
     },
     {
       title: 'Nuevo Movimiento',
-      href: route('documentos.movimientos.create'),
+      href: route('documents.movements.create'),
     },
   ];
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Nuevo Movimiento" />
-      <DocumentosLayout title="Nuevo Movimiento" description="Crea un nuevo movimiento.">
+      <DocumentsLayout title="Nuevo Movimiento" description="Crea un nuevo movimiento.">
         <div className="p-4">
           <h1 className="mb-4 text-2xl font-bold">Agregar Nuevo Movimiento</h1>
-          <ExpedienteMovimientoForm expedientes={expedientes} dependencias={dependencias} expedienteId={expediente} />
+          <FileMovementForm files={files} dependencies={dependencies} file_id={file} />
         </div>
-      </DocumentosLayout>
+      </DocumentsLayout>
     </AppLayout>
   );
 }

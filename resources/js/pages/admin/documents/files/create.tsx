@@ -1,31 +1,32 @@
 import DocumentosLayout from '@/layouts/admin/documents/layout';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, DropdownOption } from '@/types';
+import { type BreadcrumbItem, Option } from '@/types';
 import { Head } from '@inertiajs/react';
-import ExpedienteForm from '@/components/forms/file-form';
+import FileForm from '@/components/forms/file-form';
 import { usePage } from '@inertiajs/react';
+import { route } from "ziggy-js";
 
-export default function CreateExpediente() {
+export default function CreateFile() {
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'EXPEDIENTES',
-      href: route('documentos.expedientes.index'),
+      href: route('documents.files.index'),
     },
     {
       title: 'Nuevo Expediente',
-      href: route('documentos.expedientes.create'),
+      href: route('documents.files.create'),
     },
   ];
 
   const { props } = usePage<{ 
-    tipos: DropdownOption[], 
-    dependencias: DropdownOption[],
-    instituciones: DropdownOption[],
-    personas: DropdownOption[],
-    roles: DropdownOption[],
-    personas_roles: DropdownOption[],
-    tipos_instituciones: DropdownOption[],
-    tipos_dependencias: DropdownOption[],
+    types: Option[], 
+    dependencies: Option[],
+    institutions: Option[],
+    persons: Option[],
+    positions: Option[],
+    person_positions: Option[],
+    types_institutions: Option[],
+    types_dependencies: Option[],
   }>();
 
   return (
@@ -36,7 +37,7 @@ export default function CreateExpediente() {
         <div className="p-4">
           <h1 className="text-2xl font-bold mb-4">Agregar Nuevo Expediente</h1>
           {/* Formulario de creación de expediente */}
-          <ExpedienteForm {...props}/>
+          <FileForm {...props}/>
         </div>
       </DocumentosLayout>
     </AppLayout>
