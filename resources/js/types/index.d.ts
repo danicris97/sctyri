@@ -62,7 +62,7 @@ export type Paginated<T> = {
 };
 
 export type Option = {
-  value: number
+  value: number | string
   label: string
 }
 

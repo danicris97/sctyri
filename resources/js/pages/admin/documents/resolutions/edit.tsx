@@ -2,7 +2,7 @@ import DocumentosLayout from '@/layouts/admin/documents/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import ResolucionForm from '@/components/forms/resolucion-form';
+import ResolucionForm from '@/components/forms/resolution-form';
 import { type ResolucionType } from '@/schemas/resolucion-schema';
 
 export default function EditResolucion() {

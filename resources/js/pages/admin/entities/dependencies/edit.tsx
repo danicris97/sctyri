@@ -2,7 +2,7 @@ import EntidadesLayout from '@/layouts/admin/entities/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, DropdownOption } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import DependenciaUnsaForm from '@/components/forms/dependencia-unsa-form';
+import DependenciaUnsaForm from '@/components/forms/dependency-form';
 import { type DependenciaUnsaType } from '@/schemas/dependencia-unsa-schema';
 
 export default function EditDependenciaUnsa() {

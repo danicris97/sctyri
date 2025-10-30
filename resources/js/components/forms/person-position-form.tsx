@@ -3,10 +3,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { ComboBox } from '@/components/ui/combobox';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { type Option } from '@/types';
-import { PersonPosition, PersonPositionFormData, PersonPositionType } from '@/types/person';
+import { PersonPosition, PersonPositionFormData } from '@/types/person';
 
 type PersonPositionFormProps = {
     personPosition?: PersonPosition;
@@ -15,7 +15,6 @@ type PersonPositionFormProps = {
     errors?: Record<string, string>;
     onSuccess?: (personPosition: PersonPosition) => void;
     onSubmit?: (data: PersonPositionFormData) => Promise<void> | void;
-    isModal?: boolean;
 };
 
 export default function PersonPositionForm({
@@ -62,7 +61,6 @@ export default function PersonPositionForm({
         setSearchFile(checked);
         
         if (!checked) {
-            // Si desactivamos la búsqueda, limpiamos la persona seleccionada
             setData('person_id', null);
             setData('person', {
                 id: 0,
@@ -77,16 +75,13 @@ export default function PersonPositionForm({
         }
     };
 
-    const handleSelectPersona = async (personId: number | null) => {
+    const handleSelectPerson = async (personId: string | null) => {
         if (!personId) {
           setData('person_id', null)
           return
         }
         const id = Number(personId)
-        setData('person_id', id)  
-
-        const personaSeleccionada = persons.find(p => p.value === personId)
-        
+        setData('person_id', id)
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -119,8 +114,8 @@ export default function PersonPositionForm({
                             <Label>Seleccionar Persona</Label>
                             <ComboBox
                                 options={persons}
-                                value={data.person_id ? String(data.person_id) : null}
-                                onChange={handleSelectPersona}
+                                value={data.person_id ? data.person_id : null}
+                                onChange={handleSelectPerson}
                                 placeholder="Buscar por DNI o nombre..."
                                 className="w-full"
                             />
@@ -128,8 +123,6 @@ export default function PersonPositionForm({
                     )}
                 </div>
             )}
-
-            {/* Mostrar loading mientras se cargan los datos de ubicación - REMOVIDO */}
 
             {/* Sección de Datos Personales */}
             <div className="border-b pb-4">
@@ -268,7 +261,7 @@ export default function PersonPositionForm({
                     <ComboBox
                         options={positions}
                         value={data.position ?? null}
-                        onChange={(val) => setData('position', val)}
+                        onChange={(val) => setData('position',val ?? '')}
                         placeholder="Seleccione un cargo"
                         className="w-full"
                     />

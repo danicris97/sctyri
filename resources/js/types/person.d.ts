@@ -28,8 +28,8 @@ export interface PersonPosition {
 
 export interface PersonPositionFormData {
     id?: number;
-    person_id: number | null;
-    position: PersonPositionType | '';
+    person_id: number | string | null;
+    position: string | '';
     active: boolean;
     person: {
         id?: number;

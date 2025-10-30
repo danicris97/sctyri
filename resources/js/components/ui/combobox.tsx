@@ -1,4 +1,3 @@
-// combobox.tsx
 import * as React from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -12,12 +11,14 @@ import { Button } from "@/components/ui/button"
 import { Option } from "@/types"
 
 type ComboBoxProps = {
-  options:Option[]
-  value: number | null
-  onChange: (value: number | null) => void
+  options: Option[]
+  value: string | number | null
+  onChange: (value: string | null) => void
   placeholder?: string
   className?: string
-  defaultValue?: number | null
+  /** Valor por defecto opcional que se muestra si no hay selección */
+  defaultValue?: string
+  /** Deshabilita el combobox completo (botón y apertura) */
   disabled?: boolean
 }
 
@@ -27,7 +28,7 @@ export function ComboBox({
   onChange,
   placeholder = "Seleccionar...",
   className = "w-full",
-  defaultValue = null,
+  defaultValue,
   disabled = false,
 }: ComboBoxProps) {
   const [open, setOpen] = React.useState(false)
@@ -35,19 +36,20 @@ export function ComboBox({
   const containerRef = React.useRef<HTMLDivElement>(null)
   const buttonRef = React.useRef<HTMLButtonElement>(null)
 
-  const activeValue = value ?? defaultValue ?? null
   const selectedLabel =
-    activeValue !== null
-      ? options.find((opt) => opt.value === activeValue)?.label ?? placeholder
-      : placeholder
+    options.find((opt) => String(opt.value) === value)?.label ??
+    (defaultValue
+      ? options.find((opt) => String(opt.value) === defaultValue)?.label
+      : placeholder)
 
   const filteredOptions = options.filter((option) =>
     option.label.toLowerCase().includes(search.toLowerCase())
   )
 
-  const handleSelect = (selectedValue: number) => {
+  const handleSelect = (selectedValue: string | number) => {
     if (disabled) return
-    onChange(selectedValue === value ? null : selectedValue)
+    const normalized = String(selectedValue)
+    onChange(normalized === value ? null : normalized)
     setOpen(false)
   }
 
@@ -108,7 +110,11 @@ export function ComboBox({
                     <Check
                       className={cn(
                         "ml-auto h-4 w-4",
-                        activeValue !== null && opt.value === activeValue
+                        (value
+                          ? String(opt.value) === value
+                          : defaultValue
+                            ? String(opt.value) === defaultValue
+                            : false)
                           ? "opacity-100"
                           : "opacity-0"
                       )}

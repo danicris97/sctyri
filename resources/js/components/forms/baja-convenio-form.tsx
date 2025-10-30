@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { type BajaConvenioType } from '@/schemas/baja-convenio-schema';
 import { type DropdownOption } from '@/types';
-import ResolucionForm from './resolucion-form';
+import ResolucionForm from './resolution-form';
 import { Plus } from 'lucide-react';
 import axios from 'axios';
 

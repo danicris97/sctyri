@@ -2,7 +2,7 @@ import EntidadesLayout from '@/layouts/admin/entities/layout';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, DropdownOption } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import InstitucionForm from '@/components/forms/institucion-form';
+import InstitucionForm from '@/components/forms/institution-form';
 import { type InstitucionType } from '@/schemas/institucion-schema';
 
 export default function EditInstitucion() {

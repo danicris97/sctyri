@@ -10,7 +10,7 @@ import { type RenovacionConvenioType } from '@/schemas/renovacion-convenio-schem
 import { toast } from 'sonner';
 import { type DropdownOption } from '@/types';
 import { GenericDialog } from '../ui/generic-dialog';
-import ResolucionForm from './resolucion-form';
+import ResolucionForm from './resolution-form';
 import { Plus } from 'lucide-react';
 import axios from 'axios';
 

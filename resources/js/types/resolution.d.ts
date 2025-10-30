@@ -4,15 +4,25 @@ export type ResolutionType = 'AU' | 'CS' | 'DR' | 'CDEX' | 'IEM' | 'DEX' | 'CDNA
 export interface Resolution {
     id: number;
     number: string;
-    date: Date;
+    date: string | Date;
     type: ResolutionType | null;
     matter: string | null;
     link: string | null;
-    file_id: number;
+    file_id: number | null;
     created_at: Date;
     updated_at: Date;
     deleted_at: Date | null;
     formated_date: string;
     name: string;
     year: number;
+}
+
+export interface ResolutionFormData {
+    id?: number;
+    number: string;
+    date: string;
+    type: string;
+    matter?: string | null;
+    link: string;
+    file_id?: number;
 }

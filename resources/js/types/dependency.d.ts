@@ -6,6 +6,7 @@ export interface Dependency {
     type: DependencyType;
     abbreviation: string | null;
     parent_dependency_id: number | null;
+    locality: string | null;
     locality_id: number | null;
     address: string | null;
     phone: string | null;
@@ -15,4 +16,19 @@ export interface Dependency {
     created_at: Date;
     updated_at: Date;
     deleted_at: Date | null;
+}
+
+export interface DependencyFormData {
+    id?: number;
+    name: string;
+    type: string;
+    abbreviation: string | null;
+    parent_dependency_id: number | null;
+    locality: string | null;
+    locality_id: number | null;
+    address: string | null;
+    phone: string | null;
+    email: string | null;
+    webpage: string | null;
+    active: boolean;
 }
