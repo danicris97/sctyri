@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\website;
+namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -13,16 +13,14 @@ class ContactController extends Controller
     public function submit(Request $request)
     {
         $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => 'required|email',
-            'telefono' => 'nullable|string|max:50',
-            'asunto' => 'required|string|max:255',
-            'mensaje' => 'required|string|max:2000',
-            'destinatario' => 'required|in:coope,rrii,ambas',
+            'phone' => 'nullable|string|max:50',
+            'affair' => 'required|string|max:255',
+            'menssege' => 'required|string|max:2000',
+            'destinatary' => 'required|in:coope,rrii,ambas',
             'recaptcha_token' => 'required|string',
         ]);
-
-        \Log::info('Validando captcha');
 
         $recaptchaSecret = config('services.recaptcha.secret_key');
         $minimumScore = config('services.recaptcha.minimum_score', 0.5);
@@ -46,21 +44,15 @@ class ContactController extends Controller
             }
         }
 
-        \Log::info('Captcha validado correctamente');
-
         // Determinar destinatarios
-        $emails = match ($validated['destinatario']) {
+        $emails = match ($validated['destinatary']) {
             'coope' => ['ctyri@unsa.edu.ar'],
             'rrii'  => ['coreinte@unsa.edu.ar'],
             'ambas' => ['ctyri@unsa.edu.ar', 'coreinte@unsa.edu.ar'],
         };
 
-        \Log::info('Enviando correo a: ' . implode(', ', $emails));
-
         // Enviar correo
         Mail::to($emails)->send(new ContactFormMail($validated));
-
-        \Log::info('Correo enviado correctamente');
 
         return redirect()->route('home')->with('success', 'Mensaje enviado correctamente');
     }

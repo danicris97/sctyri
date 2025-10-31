@@ -10,35 +10,35 @@ class SearchRequest extends FormRequest
     {
         return [
             'q' => ['nullable','string','max:200'],
-            'convenio' => ['array'],
-            'convenio.expediente_id' => ['nullable','integer','exists:expedientes,id'],
-            'convenio.tipo_convenio' => ['nullable','string','max:100'],
-            'convenio.anio_resolucion' => ['nullable','integer','digits:4'],
-            'convenio.institucion_id' => ['nullable','integer','exists:instituciones,id'],
-            'convenio.dependencia_id' => ['nullable','integer','exists:dependencias_unsa,id'],
-            'convenio.firmante_unsa_id' => ['nullable','integer','exists:personas_roles,id'],
-            'convenio.tipo_renovacion' => ['nullable','string','max:100'],
-            'convenio.internacional' => ['nullable','in:0,1,true,false'],
-            'convenio.fecha_desde' => ['nullable','date'],
-            'convenio.fecha_hasta' => ['nullable','date','after_or_equal:convenio.fecha_desde'],
+            'agreement' => ['array'],
+            'agreement.file_id' => ['nullable','integer','exists:files,id'],
+            'agreement.agreement_type' => ['nullable','string','max:100'],
+            'agreement.year' => ['nullable','integer','digits:4'],
+            'agreement.institution_id' => ['nullable','integer','exists:institutions,id'],
+            'agreement.dependency_id' => ['nullable','integer','exists:dependencies,id'],
+            'agreement.person_position_id' => ['nullable','integer','exists:person_positions,id'],
+            'agreement.agreement_renewal_type' => ['nullable','string','max:100'],
+            'agreement.international' => ['nullable','in:0,1,true,false'],
+            'agreement.date_since' => ['nullable','date'],
+            'agreement.date_until' => ['nullable','date','after_or_equal:agreement.date_since'],
 
-            'expediente' => ['array'],
-            'expediente.anio' => ['nullable','string','max:4'],
-            'expediente.tipo' => ['nullable','string','max:50'],
-            'expediente.dependencia_id' => ['nullable','integer','exists:dependencias_unsa,id'],
-            'expediente.causante_dependencia_id' => ['nullable','integer','exists:dependencias_unsa,id'],
-            'expediente.causante_institucion_id' => ['nullable','integer','exists:instituciones,id'],
-            'expediente.causante_persona_id' => ['nullable','integer','exists:personas,id'],
+            'file' => ['array'],
+            'file.year' => ['nullable','string','max:4'],
+            'file.type' => ['nullable','string','max:50'],
+            'file.dependency_id' => ['nullable','integer','exists:dependencies,id'],
+            'file.causative_dependency_id' => ['nullable','integer','exists:dependencies,id'],
+            'file.causative_institution_id' => ['nullable','integer','exists:institutions,id'],
+            'file.causative_person_id' => ['nullable','integer','exists:people,id'],
         ];
     }
 
     protected function prepareForValidation(): void
     {
         // Normalizaciones/casts si te llegan strings "true"/"false"
-        $convenio = $this->input('convenio', []);
-        if (array_key_exists('internacional', $convenio)) {
-            $convenio['internacional'] = filter_var($convenio['internacional'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        $agreement = $this->input('agreement', []);
+        if (array_key_exists('international', $agreement)) {
+            $agreement['international'] = filter_var($agreement['international'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
         }
-        $this->merge(['convenio' => $convenio]);
+        $this->merge(['agreement' => $agreement]);
     }
 }

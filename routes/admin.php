@@ -179,5 +179,3 @@ Route::middleware(['auth', 'verified', 'role_or_permission:admin|user|becario'])
         });
     });
 });
-
-require __DIR__.'/auth.php';

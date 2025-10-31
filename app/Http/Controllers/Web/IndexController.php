@@ -1,27 +1,27 @@
 <?php
 
-namespace App\Http\Controllers\website;
+namespace App\Http\Controllers\Web;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
 use App\Models\{
-    Convenio,
+    Agreement,
 };
-use App\Http\Enum\ConvenioEnum;
+use App\Enums\AgreementEnum;
 
-class InicioController extends Controller
+class IndexController extends Controller
 {
     public function index()
     {
-        $convenios = Convenio::all()->count();
-        $convenios_internacionales = Convenio::where('internacional', true)->count();
-        $pasantias = Convenio::where('tipo_convenio', ConvenioEnum::Pasantia)->count();
-        $pps = Convenio::where('tipo_convenio', ConvenioEnum::PPS)->count();
+        $agreements = Agreement::all()->count();
+        $agreements_internationals = Agreement::where('international', true)->count();
+        $pasantias = Agreement::where('type', AgreementEnum::Pasantia)->count();
+        $pps = Agreement::where('type', AgreementEnum::PPS)->count();
 
-        return Inertia::render('website/page', [
-            'convenios' => $convenios,
-            'convenios_internacionales' => $convenios_internacionales,
+        return Inertia::render('web/page', [
+            'agreements' => $agreements,
+            'agreements_internationals' => $agreements_internationals,
             'pasantias' => $pasantias,
             'pps' => $pps,
         ]);

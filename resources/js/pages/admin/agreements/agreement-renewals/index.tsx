@@ -1,5 +1,5 @@
 import { BreadcrumbItem, Option } from '@/types'; // asegúrate que extiende de Inertia
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, router } from '@inertiajs/react';
 import { FileText, Calendar } from 'lucide-react';
 import { StatCard } from '@/components/ui/stat-card';
 import { DataTable } from '@/components/ui/data-table';
@@ -156,7 +156,7 @@ export default function AgreementRenewalsIndex() {
                     currentPage={agreementRenewals.current_page}
                     totalPages={agreementRenewals.last_page}
                     onPageChange={(page) => {
-                      route('agreement.renewals.index', {
+                      router.get(route('agreement.renewals.index'), {
                         page,
                         search: search, // este lo traés de props
                         sort,
@@ -169,7 +169,7 @@ export default function AgreementRenewalsIndex() {
                     }}
 
                     onSort={(column, direction) => {
-                      route('agreement.renewals.index'), {
+                      router.get(route('agreement.renewals.index'), {
                         sort: column,
                         direction,
                         search: search, // también lo pasás
@@ -182,7 +182,7 @@ export default function AgreementRenewalsIndex() {
                     }}
                     defaultSort={{ column: 'created_at', direction: 'desc' }}
                     onSearch={(value) => {
-                      route('agreement.renewals.index', { search: value, ...filters }, {
+                      router.get(route('agreement.renewals.index'), { search: value, ...filters }, {
                         preserveState: true,
                         replace: true,
                       });
@@ -208,8 +208,8 @@ export default function AgreementRenewalsIndex() {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      // Limpia los filtros reiniciando la página sin query params
-                      route('agreement.renewals.index', { ...filters }, { preserveState: true });
+                      // Limpia los filtros reiniciando la pagina sin query params
+                      router.get(route('agreement.renewals.index'), { ...filters }, { preserveState: true });
                       setShowFilters(false);
                     }}
                   >
@@ -219,7 +219,7 @@ export default function AgreementRenewalsIndex() {
                   <Button
                     className="bg-[#0e3b64] text-white hover:bg-[#3e7fca]"
                     onClick={() => {
-                      route('agreement.renewals.index', {
+                      router.get(route('agreement.renewals.index'), {
                         date_since: filters.date_since,
                         date_until: filters.date_until,
                         type_renewal: filters.type_renewal,

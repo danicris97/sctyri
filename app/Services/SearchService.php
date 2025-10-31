@@ -2,133 +2,135 @@
 
 namespace App\Services;
 
-use App\Models\Convenio;
-use App\Models\Expediente;
+use App\Models\{
+    Agreement,
+    File
+};
 
-class BuscadorService
+class SearchService
 {
     public function searchText($q, $filters = []): array
     {
         $trimmedQuery = trim($q);
         $needle = '%' . $trimmedQuery . '%';
 
-        $expedienteFilters = $filters['expediente'] ?? [];
-        $convenioFilters   = $filters['convenio'] ?? [];
+        $fileFilters = $filters['file'] ?? [];
+        $agreementFilters   = $filters['agreement'] ?? [];
 
-        $hasExpFilters  = !empty(array_filter($expedienteFilters, fn ($v) => $v !== null && $v !== ''));
-        $hasConvFilters = !empty(array_filter($convenioFilters,   fn ($v) => $v !== null && $v !== ''));
+        $hasFileFilters  = !empty(array_filter($fileFilters, fn ($v) => $v !== null && $v !== ''));
+        $hasAgreementFilters = !empty(array_filter($agreementFilters,   fn ($v) => $v !== null && $v !== ''));
 
         // Si no hay filtros y q está vacío, no devolvemos nada
-        if (!$hasExpFilters && !$hasConvFilters && $trimmedQuery === '') {
+        if (!$hasFileFilters && !$hasAgreementFilters && $trimmedQuery === '') {
             return [];
         }
 
-        $expedienteResults = [];
-        $convenioResults   = [];
+        $fileResults = [];
+        $agreementResults   = [];
 
-        // Debemos ejecutar la consulta de EXPEDIENTES si:
-        // - hay filtros de expediente, O
+        // Debemos ejecutar la consulta de fileS si:
+        // - hay filtros de file, O
         // - no hay filtros de ninguno (modo "q-only": buscamos en ambos por q)
-        $shouldQueryExpedientes = $hasExpFilters || (!$hasExpFilters && !$hasConvFilters);
+        $shouldQueryFiles = $hasFileFilters || (!$hasFileFilters && !$hasAgreementFilters);
 
-        if ($shouldQueryExpedientes) {
-            $expedientes = Expediente::query()
-                ->with(['dependencia', 'causanteDependencia', 'causanteInstitucion', 'causantePersona'])
-                ->when($hasExpFilters, function ($query) use ($expedienteFilters) {
-                    $clean = array_filter($expedienteFilters, fn ($v) => $v !== null && $v !== '');
+        if ($shouldQueryFiles) {
+            $files = File::query()
+                ->with(['dependency', 'causative'])
+                ->when($hasFileFilters, function ($query) use ($fileFilters) {
+                    $clean = array_filter($fileFilters, fn ($v) => $v !== null && $v !== '');
                     if (!empty($clean) && method_exists($query->getModel(), 'scopeFilter')) {
                         $query->filter($clean);
                     }
                 })
                 ->when($trimmedQuery !== '', function ($query) use ($needle) {
                     $query->where(function ($qq) use ($needle) {
-                        $qq->where('numero', 'LIKE', $needle)
-                            ->orWhere('extracto', 'LIKE', $needle)
-                            ->orWhere('tipo', 'LIKE', $needle)
-                            ->orWhere('anio', 'LIKE', $needle)
+                        $qq->where('number', 'LIKE', $needle)
+                            ->orWhere('statement', 'LIKE', $needle)
+                            ->orWhere('type', 'LIKE', $needle)
+                            ->orWhere('year', 'LIKE', $needle)
                             ->orWhereHas('causantePersona', function ($q) use ($needle) {
                                 $q->whereHas('persona', function ($p) use ($needle) {
-                                    $p->where('nombre', 'LIKE', $needle)
+                                    $p->where('name', 'LIKE', $needle)
                                       ->orWhere('apellido', 'LIKE', $needle)
                                       ->orWhere('dni', 'LIKE', $needle);
                                 });
                             })
                             ->orWhereHas('causanteInstitucion', function ($q) use ($needle) {
-                                $q->where('nombre', 'LIKE', $needle);
+                                $q->where('name', 'LIKE', $needle);
                             })
                             ->orWhereHas('causanteDependencia', function ($q) use ($needle) {
-                                $q->where('nombre', 'LIKE', $needle);
+                                $q->where('name', 'LIKE', $needle);
                             })
-                            ->orWhereRaw("CONCAT(numero, '/', anio) LIKE ?", [$needle]);
+                            ->orWhereRaw("CONCAT(number, '/', year) LIKE ?", [$needle]);
                     });
                 })
                 ->limit(100)
                 ->get();
 
-            $expedienteResults = $expedientes->map(function (Expediente $expediente) {
+            $fileResults = $files->map(function (File $file) {
                 $stats = [];
 
-                if ($expediente->fecha_inicio) {
+                if ($file->opening_date) {
                     $stats[] = [
                         'label' => 'Fecha de inicio',
-                        'value' => optional($expediente->fecha_inicio)->format('d/m/Y'),
+                        'value' => $file->formated_opening_date,
                     ];
                 }
 
-                if ($expediente->fecha_cierre) {
+                if ($file->closing_date) {
                     $stats[] = [
                         'label' => 'Fecha de cierre',
-                        'value' => optional($expediente->fecha_cierre)->format('d/m/Y'),
+                        'value' => $file->formated_closing_date,
                     ];
                 }
 
-                if (!empty($expediente->ultimo_movimiento_fecha)) {
+                if (!empty($file->last_movement_date)) {
                     $stats[] = [
                         'label' => 'Último movimiento',
-                        'value' => $expediente->ultimo_movimiento_fecha,
+                        'value' => $file->last_movement_date,
                     ];
                 }
 
-                if (!empty($expediente->ultimo_movimiento_dependencia)) {
+                if (!empty($file->last_movement_dependency)) {
                     $stats[] = [
                         'label' => 'Destino',
-                        'value' => $expediente->ultimo_movimiento_dependencia,
+                        'value' => $file->last_movement_dependency,
                     ];
                 }
 
                 return [
-                    'id' => $expediente->id,
-                    'kind' => 'expediente',
-                    'title' => (string)($expediente->nombre ?? "Expediente #{$expediente->numero}"),
-                    'subtitle' => (string)($expediente->causante_nombre ?? ''),
+                    'id' => $file->id,
+                    'kind' => 'file',
+                    'title' => $file->name,
+                    'subtitle' => $file->causative_name,
                     'href' => null,
-                    'status' => $expediente->estado ?? null,
+                    'status' => $file->status ?? null,
                     'stats' => $stats,
                 ];
             })->all();
         }
 
-        // Debemos ejecutar la consulta de CONVENIOS si:
-        // - hay filtros de convenio, O
+        // Debemos ejecutar la consulta de agreementS si:
+        // - hay filtros de agreement, O
         // - no hay filtros de ninguno (modo "q-only": buscamos en ambos por q)
-        $shouldQueryConvenios = $hasConvFilters || (!$hasExpFilters && !$hasConvFilters);
+        $shouldQueryAgreements = $hasAgreementFilters || (!$hasFileFilters && !$hasAgreementFilters);
 
-        if ($shouldQueryConvenios) {
-            $convenios = Convenio::query()
+        if ($shouldQueryAgreements) {
+            $agreement = Agreement::query()
                 ->with([
-                    'resolucion.expediente:id,numero,anio,dependencia_id',
-                    'resolucion.expediente.dependencia:id,abreviatura,nombre',
-                    'instituciones:id,nombre',
-                    'dependenciasUnsa:id,nombre',
+                    'resolution.file:id,number,year,dependecy_id',
+                    'resolution.file.dependency:id,abbreviation,name',
+                    'institutions:id,name',
+                    'dependencies:id,name',
                 ])
-                ->when($hasConvFilters, function ($query) use ($convenioFilters) {
-                    $clean = array_filter($convenioFilters, fn ($v) => $v !== null && $v !== '');
+                ->when($hasAgreementFilters, function ($query) use ($agreementFilters) {
+                    $clean = array_filter($agreementFilters, fn ($v) => $v !== null && $v !== '');
 
-                    if (isset($clean['dependencia_id'])) {
-                        $query->whereHas('dependenciasUnsa', function ($sub) use ($clean) {
-                            $sub->where('dependencias_unsa.id', $clean['dependencia_id']);
+                    if (isset($clean['dependency_id'])) {
+                        $query->whereHas('dependencies', function ($sub) use ($clean) {
+                            $sub->where('dependecy.id', $clean['dependency_id']);
                         });
-                        unset($clean['dependencia_id']);
+                        unset($clean['dependency_id']);
                     }
 
                     if (!empty($clean) && method_exists($query->getModel(), 'scopeFilter')) {
@@ -137,75 +139,73 @@ class BuscadorService
                 })
                 ->when($trimmedQuery !== '', function ($query) use ($needle) {
                     $query->where(function ($qq) use ($needle) {
-                        $qq->where('tipo_convenio', 'LIKE', $needle)
-                            ->orWhere('titulo', 'LIKE', $needle)
-                            ->orWhere('objeto', 'LIKE', $needle)
-                            ->orWhere('observaciones', 'LIKE', $needle)
-                            ->orWhereHas('instituciones', function ($q) use ($needle) {
-                                $q->where('nombre', 'LIKE', $needle);
+                        $qq->where('type', 'LIKE', $needle)
+                            ->orWhere('object', 'LIKE', $needle)
+                            ->orWhere('observations', 'LIKE', $needle)
+                            ->orWhereHas('institutions', function ($q) use ($needle) {
+                                $q->where('name', 'LIKE', $needle);
                             })
-                            ->orWhereHas('resolucion.expediente', function ($q) use ($needle) {
-                                $q->where('numero', 'LIKE', $needle)
-                                  ->orWhere('extracto', 'LIKE', $needle)
-                                  ->orWhere('tipo', 'LIKE', $needle)
-                                  ->orWhereRaw("CONCAT(numero, '/', anio) LIKE ?", [$needle]);
+                            ->orWhereHas('resolution.file', function ($q) use ($needle) {
+                                $q->where('number', 'LIKE', $needle)
+                                  ->orWhere('statement', 'LIKE', $needle)
+                                  ->orWhere('type', 'LIKE', $needle)
+                                  ->orWhereRaw("CONCAT(number, '/', year) LIKE ?", [$needle]);
                             });
                     });
                 })
                 ->limit(100)
                 ->get();
 
-            $convenioResults = $convenios->map(function (Convenio $convenio) {
-                $expediente = optional($convenio->resolucion)->expediente;
-                $resolucion = optional($convenio->resolucion);
-                $instituciones = $convenio->instituciones ?? collect();
-                $institucionesTexto = $instituciones->pluck('nombre')->take(5)->implode(' • ');
-                $dependencias = $convenio->dependenciasUnsa ?? collect();
-                $dependenciasTexto = $dependencias->pluck('nombre')->take(5)->implode(' • ');
+            $agreementResults = $agreement->map(function (Agreement $agreement) {
+                $file = optional($agreement->resolution)->file;
+                $resolution = optional($agreement->resolution);
+                $institutions = $agreement->institutions ?? collect();
+                $institutionsText = $institutions->pluck('name')->take(5)->implode(' • ');
+                $dependencies = $agreement->dependencies ?? collect();
+                $dependenciesText = $dependencies->pluck('name')->take(5)->implode(' • ');
 
                 $stats = [];
-                if (!empty($convenio->fecha_firma)) {
+                if (!empty($agreement->date_signature)) {
                     $stats[] = [
                         'label' => 'Fecha de Firma',
-                        'value' => (string)($convenio->fecha_firma->format('d/m/Y')),
+                        'value' => $agreement->formated_date_signature,
                     ];
                 }
 
-                $finTexto = $convenio->fecha_renovacion_vigente ?? $convenio->fecha_fin;
                 if (!empty($finTexto)) {
                     $stats[] = [
                         'label' => 'Vigente hasta',
-                        'value' => (string)$finTexto->format('d/m/Y') ?? 'Sin fecha de fin',
+                        'value' => $agreement->formated_date_end ?? 'Sin fecha de fin',
                     ];
                 }
 
-                if (!empty($resolucion)) {
+                if (!empty($resolution)) {
                     $stats[] = [
                         'label' => 'Resolución',
-                        'value' => (string)$resolucion->nombre,
+                        'value' => $resolution->name,
                     ];
                 }
 
-                if (!empty($resolucion)) {
+                if (!empty($resolution)) {
                     $stats[] = [
                         'label' => 'Fecha de Resolución',
-                        'value' => (string)$resolucion->fecha_ddmmyyyy,
+                        'value' => $resolution->formated_date,
                     ];
                 }
 
                 return [
-                    'id' => $convenio->id,
-                    'kind' => 'convenio',
-                    'title' => (string)($convenio->titulo ?? ($convenio->tipo_convenio . ' - ' . $institucionesTexto) ?? 'Convenio'),
-                    'subtitle' => ($expediente->nombre . ' - ' . $dependenciasTexto) ?? ' ',
-                    'href' => $convenio->resolucion_link ?? $convenio->link ?? null,
-                    'status' => $convenio->estado ?? null,
+                    'id' => $agreement->id,
+                    'kind' => 'agreement',
+                    'title' => $agreement->title ?? 'Convenio',
+                    'subtitle' => ($file->name . ' - ' . $dependenciesText) ?? ' ',
+                    'href' => $agreement->resolution_link ?? $agreement->link ?? null,
+                    'status' => $agreement->status ?? null,
                     'stats' => $stats,
                 ];
             })->all();
         }
 
         // Merge según qué consultas se ejecutaron
-        return array_values(array_merge($convenioResults, $expedienteResults));
+        return array_values(array_merge($agreementResults, $fileResults));
     }
 }

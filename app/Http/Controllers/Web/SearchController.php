@@ -1,36 +1,36 @@
 <?php
 
-namespace App\Http\Controllers\website;
+namespace App\Http\Controllers\Web;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Enum\{
-    ConvenioEnum,
-    RenovacionConvenioEnum,
-    ExpedienteEnum
+use App\Enums\{
+    AgreementEnum,
+    AgreementRenewalEnum,
+    FileEnum
 };
 use App\Models\{
-    Convenio,
-    Institucion,
-    DependenciaUnsa,
-    PersonaRol,
-    Expediente,
-    Resolucion,
-    Persona,
+    Agreement,
+    Institution,
+    Dependency,
+    PersonPosition,
+    File,
+    Resolution,
+    Person,
 };
 use Inertia\Inertia;
-use App\Services\BuscadorService;
+use App\Services\SearchService;
 use App\Http\Requests\Web\SearchRequest;
 
-class BuscadorController extends Controller
+class SearchController extends Controller
 {
-    public function index(SearchRequest $request, BuscadorService $service)
+    public function index(SearchRequest $request, SearchService $service)
     { 
         $query = $request->get('q', '');
 
         $filters = [
-            'convenio'   => $request->validated('convenio', []),
-            'expediente' => $request->validated('expediente', []),
+            'agreement'   => $request->validated('agreement', []),
+            'file' => $request->validated('file', []),
         ];
 
         $results = [];
@@ -41,18 +41,18 @@ class BuscadorController extends Controller
             $results = $service->searchText($query, $filters);
         }
 
-        return Inertia::render('website/search', [
+        return Inertia::render('web/search', [
             'q' => $query,
             'results' => $results,
             'filters' => $filters,
-            'convenios_tipos' => ConvenioEnum::options(),
-            'instituciones' => Institucion::getDropdownOptions(),
-            'dependencias' => DependenciaUnsa::getDropdownOptions(),
-            'firmantes_unsa' => PersonaRol::getDropdownNoAlumnosOptions(),
-            'expedientes' => Expediente::getDropdownOptions(),
-            'renovaciones_convenios_tipos' => RenovacionConvenioEnum::options(),
-            'expedientes_tipos' => ExpedienteEnum::options(),
-            'personas' => Persona::getDropdownOptions()
+            'agreement_types' => AgreementEnum::options(),
+            'institutions' => Institution::getOptions(),
+            'dependencies' => Dependency::getOptions(),
+            'person_positions' => PersonPosition::getOptionsNoStudent(),
+            'files' => Files::getOptions(),
+            'agreement_renewal_types' => AgreementRenewalEnum::options(),
+            'files_types' => FileEnum::options(),
+            'person' => Person::getOptions()
         ]);
     }
 
