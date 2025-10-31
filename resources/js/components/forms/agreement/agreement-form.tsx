@@ -42,16 +42,16 @@ export default function agreementForm({
   resolutions = [],
   showResolutionSection = true,
 }: AgreementFormProps) {
-  const { data, setData, processing, errors, updateResolution, handleSubmit } = useAgreementForm({ agreement })
-  const [isExpedienteDialogOpen, setIsExpedienteDialogOpen] = useState(false)
-  const [fileOptions, setfileOptions] = useState<Option[]>(files ?? [])
+  const { data, setData, processing, errors, handleSubmit } = useAgreementForm({ agreement })
+  const [isFileDialogOpen, setIsFileDialogOpen] = useState(false)
+  const [fileOptions, setFileOptions] = useState<Option[]>(files ?? [])
 
-  const openFileDialog = () => setIsExpedienteDialogOpen(true)
-  const closeExpedienteDialog = () => setIsExpedienteDialogOpen(false)
+  const openFileDialog = () => setIsFileDialogOpen(true)
+  const closeFileDialog = () => setIsFileDialogOpen(false)
 
   useEffect(() => {
     if (!Array.isArray(files)) return
-    setfileOptions((prev) => {
+    setFileOptions((prev) => {
       const existingIds = new Set(prev.map((option) => String(option.value)))
       const additions = files.filter((option) => !existingIds.has(String(option.value)))
       return additions.length > 0 ? [...prev, ...additions] : prev
@@ -59,58 +59,58 @@ export default function agreementForm({
   }, [files])
 
   useEffect(() => {
-    const current = data?.resolucion?.expediente
-    if (!current?.id) return
+    const current = data?.resolution?.file_id
+    if (!current) return
     const label =
       (current as any)?.nombre ??
-      [current.numero, current.anio].filter((part) => part !== undefined && part !== null && part !== "").join("/") ??
-      `Expediente ${current.id}`
+      [current.number, current.year].filter((part) => part !== undefined && part !== null && part !== "").join("/") ??
+      `Expediente ${current}`
 
-    setfileOptions((prev) => {
-      const exists = prev.some((option) => Number(option.value) === current.id)
-      return exists ? prev : [...prev, { value: current.id, label }]
+    setFileOptions((prev) => {
+      const exists = prev.some((option) => Number(option.value) === current)
+      return exists ? prev : [...prev, { value: current, label }]
     })
-  }, [data?.resolucion?.expediente?.id])
+  }, [data?.resolution?.file_id])
 
-  const handleExpedienteCreated = (expediente: { id: number; nombre?: string | null; numero?: string; anio?: number }) => {
+  const handleFileCreated = (file: { id: number; nombre?: string | null; number?: string; anio?: number }) => {
     const label =
-      expediente?.nombre ??
-      [expediente?.numero, expediente?.anio].filter((part) => part !== undefined && part !== null && part !== "").join("/") ??
-      `Expediente ${expediente.id}`
+      file?.nombre ??
+      [file?.number, file?.anio].filter((part) => part !== undefined && part !== null && part !== "").join("/") ??
+      `Expediente ${file.id}`
 
-    setfileOptions((prev) => {
-      const exists = prev.some((option) => Number(option.value) === expediente.id)
+    setFileOptions((prev) => {
+      const exists = prev.some((option) => Number(option.value) === file.id)
       if (exists) {
         return prev.map((option) =>
-          Number(option.value) === expediente.id ? { ...option, label } : option
+          Number(option.value) === file.id ? { ...option, label } : option
         )
       }
-      return [...prev, { value: expediente.id, label }]
+      return [...prev, { value: file.id, label }]
     })
 
     setData((prev: AgreementFormData) => {
-      const previousResolucion = (prev as any)?.resolucion
+      const previousResolution = (prev as any)?.resolution
       const fallback = {
-        id: previousResolucion?.id ?? null,
-        numero: previousResolucion?.numero ?? "",
-        fecha: previousResolucion?.fecha ?? "",
-        tipo: previousResolucion?.tipo ?? null,
-        link: previousResolucion?.link ?? null,
-        expediente_id: previousResolucion?.expediente_id ?? null,
-        expediente: previousResolucion?.expediente ?? null,
+        id: previousResolution?.id ?? null,
+        number: previousResolution?.number ?? "",
+        date: previousResolution?.date ?? "",
+        type: previousResolution?.type ?? null,
+        link: previousResolution?.link ?? null,
+        file_id: previousResolution?.file_id ?? null,
+        file: previousResolution?.file ?? null,
       }
 
       return {
         ...prev,
-        resolucion: {
-          ...(previousResolucion ?? fallback),
-          expediente_id: expediente.id,
-          expediente: expediente as any,
+        resolution: {
+          ...(previousResolution ?? fallback),
+          file_id: file.id,
+          file: file as any,
         },
       } as typeof prev
     })
 
-    closeExpedienteDialog()
+    closeFileDialog()
   }
 
   return (
@@ -120,19 +120,18 @@ export default function agreementForm({
         <div>
           <h3 className="text-xl font-semibold border-b pb-2 mb-4">Resolucion</h3>
           <ResolutionSection
-            resolution={data?.resolucion}
+            resolution={data?.resolution}
             resolutions_types={resolutions_types ?? []}
             files={fileOptions}
-            onResolutionChange={updateResolution}
             errors={errors}
             onOpenNewFile={openFileDialog}
           />
         </div>
       )}
 
-      {/* Seccion de Datos del agreement */}
+      {/* Seccion de Datos del Convenio */}
       <div>
-        <h3 className="text-xl font-semibold border-b pb-2 mb-4">Datos del agreement</h3>
+        <h3 className="text-xl font-semibold border-b pb-2 mb-4">Datos del Convenio</h3>
         <AgreementDataSection
           data={data}
           agreements_types={agreements_types}
@@ -149,7 +148,7 @@ export default function agreementForm({
           data={data}
           institutionsProps={institutions}
           dependenciesProps={dependencies}
-          person_positionsProps={person_positions}
+          personPositionsProps={person_positions}
           onChange={setData}
           institutions_types={institutions_types}
           dependencies_types={dependencies_types}

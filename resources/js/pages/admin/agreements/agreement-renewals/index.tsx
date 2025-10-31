@@ -1,5 +1,5 @@
 import { BreadcrumbItem, Option } from '@/types'; // asegúrate que extiende de Inertia
-import { Head, usePage, router } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { FileText, Calendar } from 'lucide-react';
 import { StatCard } from '@/components/ui/stat-card';
 import { DataTable } from '@/components/ui/data-table';
@@ -14,19 +14,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import 'dayjs/locale/es';
 import { route } from "ziggy-js";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Renovaciones de Convenios',
-        href: route('agreement.agreement-renewals.index'),
+        href: route('agreement.renewals.index'),
     },
 ];
 
 // Estadísticas de ejemplo
 
-export default function RenovacionesConveniosIndex() {
+export default function AgreementRenewalsIndex() {
     const { agreementRenewals, search, sort, direction, toast: flashToast, types = [], agreements = [], files = [], institutions = [], dependencies = [], stats } = usePage().props as unknown as {
       agreementRenewals: {
         data: AgreementRenewal[];
@@ -157,7 +156,7 @@ export default function RenovacionesConveniosIndex() {
                     currentPage={agreementRenewals.current_page}
                     totalPages={agreementRenewals.last_page}
                     onPageChange={(page) => {
-                      router.get(route('agreement.agreement-renewals.index'), {
+                      route('agreement.renewals.index', {
                         page,
                         search: search, // este lo traés de props
                         sort,
@@ -170,7 +169,7 @@ export default function RenovacionesConveniosIndex() {
                     }}
 
                     onSort={(column, direction) => {
-                      router.get(route('agreement.agreement-renewals.index'), {
+                      route('agreement.renewals.index'), {
                         sort: column,
                         direction,
                         search: search, // también lo pasás
@@ -183,16 +182,16 @@ export default function RenovacionesConveniosIndex() {
                     }}
                     defaultSort={{ column: 'created_at', direction: 'desc' }}
                     onSearch={(value) => {
-                      router.get(route('agreement.agreement-renewals.index'), { search: value, ...filters }, {
+                      route('agreement.renewals.index', { search: value, ...filters }, {
                         preserveState: true,
                         replace: true,
                       });
                     }}
-                    onNew={() => router.get(route('agreement.agreement-renewals.create'))}
+                    onNew={() => route('agreement.renewals.create')}
                     onOpenFilter={() => setShowFilters(true)}
                     actionLinks={(row) => ({
-                      view: () => route('agreement.agreement-renewals.show', { agreementRenewal: row.id }),
-                      edit: route('agreement.agreement-renewals.edit', { agreementRenewal: row.id }),
+                      view: () => route('agreement.renewals.show', { agreementRenewal: row.id }),
+                      edit: route('agreement.renewals.edit', { agreementRenewal: row.id }),
                       delete: () => setAgreementRenewalToDelete(row),
                     })}
                   />
@@ -210,7 +209,7 @@ export default function RenovacionesConveniosIndex() {
                     variant="outline"
                     onClick={() => {
                       // Limpia los filtros reiniciando la página sin query params
-                      router.get(route('agreement.agreement-renewals.index'), { ...filters }, { preserveState: true });
+                      route('agreement.renewals.index', { ...filters }, { preserveState: true });
                       setShowFilters(false);
                     }}
                   >
@@ -220,7 +219,7 @@ export default function RenovacionesConveniosIndex() {
                   <Button
                     className="bg-[#0e3b64] text-white hover:bg-[#3e7fca]"
                     onClick={() => {
-                      router.get(route('agreement.agreement-renewals.index'), {
+                      route('agreement.renewals.index', {
                         date_since: filters.date_since,
                         date_until: filters.date_until,
                         type_renewal: filters.type_renewal,
@@ -331,7 +330,7 @@ export default function RenovacionesConveniosIndex() {
               onConfirm={() => {
                 if (agreementRenewalToDelete) {
                   const id = agreementRenewalToDelete.id;
-                  router.delete(route('agreement.agreement-renewals.destroy', id));
+                  route('agreement.renewals.destroy', id);
                 }
               }}
               title="¿Eliminar renovación de convenio?"

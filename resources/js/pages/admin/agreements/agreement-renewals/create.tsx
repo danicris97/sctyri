@@ -1,47 +1,48 @@
-import ConveniosLayout from '@/layouts/admin/agreements/layout';
+import AgreementLayout from '@/layouts/admin/agreements/layout';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, DropdownOption } from '@/types';
+import { type BreadcrumbItem, Option } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import RenovacionConvenioForm from '@/components/forms/agreement-renewal-form';
+import AgreementRenewalForm from '@/components/forms/agreement-renewal-form';
+import { route } from 'ziggy-js';
 
-export default function CreateRenovacionConvenio() {
+export default function CreateAgreementRenewal() {
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'RENOVACIONES DE CONVENIOS',
-      href: route('convenios.renovaciones.index'),
+      href: route('agreements.renewals.index'),
     },
     {
       title: `Crear Renovación de Convenio`,
-      href: route('convenios.renovaciones.create'),
+      href: route('agreements.renewals.create'),
     },
   ];
 
   const { props } = usePage<{
-    convenios: DropdownOption[];
-    resoluciones: { value: string; label: string }[];
-    resoluciones_tipos: { value: string; label: string }[];
-    expedientes: { value: string; label: string }[];
-    convenio?: number | string | null;
+    agreements: Option[];
+    resolutions: Option[];
+    resolution_types: Option[];
+    files: Option[];
+    agreement?: number | string | null;
   }>()
 
-  const { convenios, resoluciones, resoluciones_tipos, expedientes, convenio } = props;
-  const convenioId = typeof convenio === 'number' ? convenio : convenio ? Number(convenio) : undefined;
+  const { agreements, resolutions, resolution_types, files, agreement } = props;
+  const agreementId = typeof agreement === 'number' ? agreement : agreement ? Number(agreement) : undefined;
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Crear Renovación de Convenio" />
-      <ConveniosLayout title="Crear Renovación de Convenio" description="Crea una renovación de convenio nueva.">
+      <AgreementLayout title="Crear Renovación de Convenio" description="Crea una renovación de convenio nueva.">
         <div className="p-4">
           <h1 className="text-2xl font-bold mb-4">Crear Renovación de Convenio</h1>
-          <RenovacionConvenioForm
-            convenios={convenios}
-            resoluciones={resoluciones}
-            resoluciones_tipos={resoluciones_tipos}
-            expedientes={expedientes}
-            convenioId={convenioId}
+          <AgreementRenewalForm
+            agreements={agreements}
+            resolutions={resolutions}
+            resolutions_types={resolution_types}
+            files={files}
+            agreementId={agreementId}
           />
         </div>
-      </ConveniosLayout>
+      </AgreementLayout>
     </AppLayout>
   );
 }

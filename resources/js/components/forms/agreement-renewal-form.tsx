@@ -12,6 +12,8 @@ type AgreementRenewalFormProps = {
   agreementRenewal?: AgreementRenewal;
   agreements: Option[];
   resolutions: Option[];
+  resolutions_types: Option[];
+  files: Option[];
   onSuccess?: () => void;
   onSubmit?: (data: AgreementRenewalFormData) => void;
   agreementId?: number;
@@ -22,6 +24,8 @@ export default function AgreementRenewalForm({
   agreementRenewal,
   agreements = [],
   resolutions = [],
+  resolutions_types = [],
+  files = [],
   onSuccess,
   onSubmit,
   agreementId,

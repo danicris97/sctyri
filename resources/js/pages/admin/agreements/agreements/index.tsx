@@ -1,37 +1,36 @@
-import type { BreadcrumbItem, DropdownOption } from "@/types"
+import { BreadcrumbItem, Option } from "@/types"
 import { Head, usePage, router } from "@inertiajs/react"
 import { FilePenLine, Globe, FileCheck2, CalendarClock } from "lucide-react"
-import { StatCard } from "@/components/stat-card"
+import { StatCard } from "@/components/ui/stat-card"
 import { DataTable } from "@/components/ui/data-table"
-import type { ConvenioFullType } from "@/schemas/convenio-schema"
+import { Agreement } from "@/types/agreement"
 import AppLayout from "@/layouts/app-layout"
-import ConveniosLayout from "@/layouts/admin/agreements/layout"
+import AgreementLayout from "@/layouts/admin/agreements/layout"
 import { useState, useEffect, useMemo } from "react"
-import { ConfirmDeleteDialog } from "@/components/ui/confirm-delete-dialog"
-import { ConvenioDetailDialog } from "@/components/dialogs/convenio-detail-dialog"
-import { ConvenioFiltersDialog } from "@/components/dialogs/convenio-filters-dialog"
+import { ConfirmDeleteDialog } from "@/components/dialogs/confirm-delete-dialog"
+import { AgreementFiltersDialog } from "@/components/dialogs/agreement-filters-dialog"
 import { toast } from "sonner"
 import { route } from "ziggy-js";
 
 const breadcrumbs: BreadcrumbItem[] = [
-  { title: "Convenios", href: route("convenios.convenios.index") },
+  { title: "Convenios", href: route("agreements.agreements.index") },
 ]
 
 type Stats = {
-  total_convenios: number
-  total_activos: number
-  ultimo_semestre: number
-  total_internacionales: number
-  ultima_fecha: string | null
-  ultima_fecha_texto?: string
-  porcentaje_activos?: number
-  porcentaje_semestre?: number
-  porcentaje_internacionales?: number
+  count_agreements: number
+  count_active: number
+  count_last_semester: number
+  count_international: number
+  last_date: string | null
+  formated_last_date?: string
+  percentage_active?: number
+  percentage_semester?: number
+  percentage_international?: number
 }
 
-type ConveniosPageProps = {
-  convenios: {
-    data: ConvenioFullType[]
+type AgreementPageProps = {
+  agreements: {
+    data: Agreement[]
     current_page: number
     last_page: number
   }
@@ -42,87 +41,88 @@ type ConveniosPageProps = {
     type: "success" | "error"
     message: string
   }
-  convenios_tipos: DropdownOption[]
-  instituciones: DropdownOption[]
-  unidades_academicas: DropdownOption[]
-  firmantes_unsa: DropdownOption[]
-  resoluciones: DropdownOption[]
-  expedientes: DropdownOption[]
-  renovaciones_convenios_tipos: DropdownOption[]
+  agreement_types: Option[]
+  institutions: Option[]
+  dependecies: Option[]
+  person_positions: Option[]
+  resolutions: Option[]
+  files: Option[]
+  agreement_renewals_types: Option[]
   stats: Stats
 }
 
 export default function ConveniosIndex() {
   const {
-    convenios,
-    convenios_tipos,
+    agreements,
+    agreement_types,
     search,
     sort,
     direction,
     toast: flashToast,
-    instituciones,
-    unidades_academicas,
-    firmantes_unsa,
-    expedientes,
-    renovaciones_convenios_tipos,
+    institutions,
+    dependecies,
+    person_positions,
+    resolutions,
+    files,
+    agreement_renewals_types,
     stats,
-  } = usePage().props as unknown as ConveniosPageProps
+  } = usePage().props as unknown as AgreementPageProps
 
   const columns = [
     { title: "Resolución", 
-      accessor: "resolucion_texto", 
+      accessor: "resolution_name", 
       sortable: false,
       width: "200px",
       align: "center" as const, 
     },
     { title: "Expediente", 
-      accessor: "expediente_texto", 
+      accessor: "file_name", 
       sortable: false,
       width: "120px",
       align: "center" as const, 
     },
     { title: "Tipo", 
-      accessor: "tipo_convenio", 
+      accessor: "type", 
       sortable: true,
       width: "120px",
       align: "center" as const, 
     },
     {
       title: "Organización convenente",
-      accessor: "instituciones",
+      accessor: "institutions",
       sortable: false,
-      render: (row: any) => row.instituciones?.map((i: any) => i.nombre).join(", ") || "Sin asignar",
+      render: (row: any) => row.institutions?.map((i: any) => i.name).join(", ") || "Sin asignar",
       width: "200px",
       align: "left" as const,
     },
     {
       title: "Fecha de Suscripción",
-      accessor: "fecha_firma_texto",
+      accessor: "formated_date_signature",
       sortable: true,
       width: "140px",
       align: "center" as const,
     },
     {
       title: "Vigencia hasta",
-      accessor: "fecha_fin_texto",
+      accessor: "formated_date_end",
       sortable: false,
       width: "130px",
       align: "center" as const,
     },
     {
       title: "Renovación hasta",
-      accessor: "fecha_renovacion_vigente_texto",
+      accessor: "formated_date_renewal",
       sortable: false,
       width: "180px",
       align: "center" as const,
     },
     {
       title: "Unidad Académica",
-      accessor: "dependencias_unsa",
+      accessor: "dependencies",
       sortable: false,
       width: "200px",
       align: "center" as const,
-      render: (row: any) => row.dependencias_unsa?.map((d: any) => d.nombre).join(", ") || "Sin asignar",
+      render: (row: any) => row.dependencies?.map((d: any) => d.name).join(", ") || "Sin asignar",
     },
     {
       title: "Link",
@@ -130,9 +130,9 @@ export default function ConveniosIndex() {
       sortable: false,
       width: "120px",
       align: "center" as const,
-      render: (row: any) => row.resolucion?.link ? (
+      render: (row: any) => row.resolutions?.link ? (
         <a
-          href={row.resolucion.link}
+          href={row.resolutions.link}
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 underline hover:text-blue-800"
@@ -148,50 +148,47 @@ export default function ConveniosIndex() {
   const statsList = useMemo(() => [
     {
       title: "Total de Convenios",
-      value: stats.total_convenios.toString(),
+      value: stats.count_agreements.toString(),
       description: "Convenios registrados en el sistema",
       icon: FilePenLine,
-      trend: "Ultimo registro: " + (stats.ultima_fecha_texto ?? "Sin registros"),
+      trend: "Ultimo registro: " + (stats.formated_last_date ?? "Sin registros"),
     },
     {
       title: "Convenios Activos",
-      value: stats.total_activos.toString(),
+      value: stats.count_active.toString(),
       description: "Convenios activos en el sistema",
       icon: FileCheck2,
-      trend: `${stats.porcentaje_activos}% del total`,
+      trend: `${stats.percentage_active}% del total`,
     },
     {
       title: "Convenios en el último semestre",
-      value: stats.ultimo_semestre.toString(),
+      value: stats.count_last_semester.toString(),
       description: "Firmados en los últimos 6 meses",
       icon: CalendarClock,
-      trend: `${stats.porcentaje_semestre}% del total`,
+      trend: `${stats.percentage_semester}% del total`,
     },
     {
       title: "Convenios Internacionales",
-      value: stats.total_internacionales.toString(),
+      value: stats.count_international.toString(),
       description: "Convenios internacionales",
       icon: Globe,
-      trend: `${stats.porcentaje_internacionales}% del total`,
+      trend: `${stats.percentage_international}% del total`,
     },
   ], [stats])
 
-  const [convenioToShow, setConvenioToShow] = useState<ConvenioFullType | null>(null)
-  const [convenioToDelete, setConvenioToDelete] = useState<ConvenioFullType | null>(null)
+  const [agreementToDelete, setAgreementToDelete] = useState<Agreement | null>(null)
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState({ 
-    tipo_convenio: "",
-    numero_expediente: "",
-    expediente_id: "",
-    anio_expediente: "",
-    anio_resolucion: "",
-    tipo_renovacion: "",
-    internacional: "",
-    fecha_desde: "",
-    fecha_hasta: "",
-    institucion_id: "",
-    unidad_academica_id: "",
-    firmante_unsa_id: "",
+    type: "",
+    file_number: "",
+    file_id: "",
+    resolution_type: "",
+    renewal_type: "",
+    date_since: "",
+    date_until: "",
+    institution_id: "",
+    dependency_id: "",
+    person_position_id: "",
    })
 
    useEffect(() => {
@@ -206,7 +203,7 @@ export default function ConveniosIndex() {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Convenios" />
-      <ConveniosLayout title="Convenios" description="Todos los convenios registrados en el sistema">
+      <AgreementLayout title="Convenios" description="Todos los convenios registrados en el sistema">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {statsList.map((stat, index) => (
             <StatCard key={index} {...stat} />
@@ -216,14 +213,14 @@ export default function ConveniosIndex() {
         <div className="flex h-full flex-grow flex-col gap-4 rounded-xl p-4 overflow-x-auto">
           <DataTable
             title="Listado de Convenios"
-            totalItems={convenios.data.length}
-            data={convenios.data}
+            totalItems={agreements.data.length}
+            data={agreements.data}
             columns={columns}
-            currentPage={convenios.current_page}
-            totalPages={convenios.last_page}
+            currentPage={agreements.current_page}
+            totalPages={agreements.last_page}
             onPageChange={(page) => {
               router.get(
-                route("convenios.convenios.index"),
+                route("agreements.agreements.index"),
                 {
                   page,
                   search: search,
@@ -238,7 +235,7 @@ export default function ConveniosIndex() {
             }}
             onSort={(column, direction) => {
               router.get(
-                route("convenios.convenios.index"),
+                route("agreements.agreements.index"),
                 {
                   sort: column,
                   direction,
@@ -254,7 +251,7 @@ export default function ConveniosIndex() {
             defaultSort={{ column: "created_at", direction: "desc" }}
             onSearch={(value) => {
               router.get(
-                route("convenios.convenios.index"),
+                route("agreements.agreements.index"),
                 { search: value },
                 {
                   preserveState: true,
@@ -262,12 +259,12 @@ export default function ConveniosIndex() {
                 },
               )
             }}
-            onNew={() => router.get(route("convenios.convenios.create"))}
+            onNew={() => router.get(route("agreements.agreements.create"))}
             onOpenFilter={() => setShowFilters(true)}
             actionLinks={(row) => ({
-              view: () => setConvenioToShow(row),
-              edit: route("convenios.convenios.edit", row.id),
-              delete: () => setConvenioToDelete(row),
+              view: () => route("agreements.agreements.show", row.id),
+              edit: route("agreements.agreements.edit", row.id),
+              delete: () => setAgreementToDelete(row),
             })}
             onExport={() => {
                 // Combinar filtros aplicados con parámetros actuales de la URL
@@ -280,7 +277,7 @@ export default function ConveniosIndex() {
                 };
                 
                 // Crear URL
-                const url = new URL(route("convenios.convenios.export"), window.location.origin);
+                const url = new URL(route("agreements.agreements.export"), window.location.origin);
                 url.search = new URLSearchParams(exportParams).toString();
                 
                 // Crear un enlace temporal y hacer clic en él
@@ -300,41 +297,38 @@ export default function ConveniosIndex() {
             }}
           />
         </div>
-      </ConveniosLayout>
-
-      {/* Diálogo de detalles del convenio */}
-      <ConvenioDetailDialog convenio={convenioToShow} onClose={() => setConvenioToShow(null)} />
+      </AgreementLayout>
 
       {/* Diálogo de filtros */}
-      <ConvenioFiltersDialog
+      <AgreementFiltersDialog
         open={showFilters}
         onClose={() => setShowFilters(false)}
         filters={filters}
         onFiltersChange={setFilters}
         options={{
-          convenios_tipos,
-          instituciones,
-          unidades_academicas,
-          firmantes_unsa,
-          expedientes,
-          renovaciones_convenios_tipos,
+          agreement_types,
+          institutions,
+          dependecies,
+          person_positions,
+          files,
+          agreement_renewal_types,
         }}
       />
 
       {/* Diálogo de confirmación de eliminación */}
       <ConfirmDeleteDialog
-        open={!!convenioToDelete}
+        open={!!agreementToDelete}
         onCancel={() => {
-          setConvenioToDelete(null)
+          setAgreementToDelete(null)
         }}
         onConfirm={() => {
-          if (convenioToDelete) {
-            const id = convenioToDelete.id
-            router.delete(route("convenios.convenios.destroy", id))
+          if (agreementToDelete) {
+            const id = agreementToDelete.id
+            router.delete(route("agreements.agreements.destroy", id))
           }
         }}
         title="¿Eliminar convenio?"
-        description={`¿Estás seguro que deseas eliminar a ${convenioToDelete?.titulo || ""} ${convenioToDelete?.tipo_convenio || ""}? Esta acción no se puede deshacer.`}
+        description={`¿Estás seguro que deseas eliminar a ${agreementToDelete?.title || ""} ${agreementToDelete?.type || ""}? Esta acción no se puede deshacer.`}
       />
     </AppLayout>
   )

@@ -12,6 +12,8 @@ type AgreementCancellationFormProps = {
   agreement_cancellation?: AgreementCancellation;
   agreements: Option[];
   resolutions: Option[];
+  resolution_types: Option[];
+  files: Option[];
   onSuccess?: () => void;
   onSubmit?: (data: AgreementCancellationFormData) => void;
   agreementId?: number;
@@ -22,6 +24,8 @@ export default function AgreementCancellationForm({
   agreement_cancellation,
   agreements = [],
   resolutions = [],
+  resolution_types = [],
+  files = [],
   onSuccess,
   onSubmit,
   agreementId,

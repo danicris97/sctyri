@@ -1,36 +1,34 @@
-import { BreadcrumbItem } from '@/types'; // asegúrate que extiende de Inertia
+import { BreadcrumbItem, Option } from '@/types'; // asegúrate que extiende de Inertia
 import { Head, usePage, router } from '@inertiajs/react';
 import { FileText, Calendar, Globe, Landmark } from 'lucide-react';
-import { StatCard } from '@/components/stat-card';
+import { StatCard } from '@/components/ui/stat-card';
 import { DataTable } from '@/components/ui/data-table';
-import { type BajaConvenioType } from '@/schemas/baja-convenio-schema';
+import { AgreementCancellation } from '@/types/agreement';
 import AppLayout from '@/layouts/app-layout';
-import ConveniosLayout from '@/layouts/admin/agreements/layout';
+import AgreementsLayout from '@/layouts/admin/agreements/layout';
 import { useState, useEffect } from 'react';
-import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
-import { GenericDialog } from '@/components/ui/generic-dialog';
+import { ConfirmDeleteDialog } from '@/components/dialogs/confirm-delete-dialog';
+import { GenericDialog } from '@/components/dialogs/generic-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
-import 'dayjs/locale/es';
 import { route } from "ziggy-js";
-import { SimpleDetailList, buildDetailItems } from '@/components/ui/simple-detail-list';
 import { ComboBox } from '@/components/ui/combobox';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Baja de Convenios',
-        href: route('convenios.bajas.index'),
+        href: route('agreements.cancellations.index'),
     },
 ];
 
 // Estadísticas de ejemplo
 
-export default function BajasConveniosIndex() {
-    const { bajasConvenio, search, sort, direction, toast: flashToast, stats, convenios, resoluciones, expedientes, instituciones, dependencias } = usePage().props as unknown as {
-      bajasConvenio: {
-        data: BajaConvenioType[];
+export default function AgreementCancellationIndex() {
+    const { agreementsCancellation, search, sort, direction, toast: flashToast, stats, agreements, resolutions, files, institutions, dependencies } = usePage().props as unknown as {
+      agreementsCancellation: {
+        data: AgreementCancellation[];
         current_page: number;
         last_page: number;
       };
@@ -42,37 +40,37 @@ export default function BajasConveniosIndex() {
         message: string;
       };
       stats: {
-        ultimas_bajas: 0;
-        total_bajas: 0;
-        total_instituciones: 0;
-        total_internacionales: 0;
-        ultima_fecha: string | null;
+        count_last_cancellations: 0;
+        count_cancellations: 0;
+        count_institutions: 0;
+        count_international: 0;
+        last_date: string | null;
       };
-      convenios: { value: string; label: string }[];
-      resoluciones: { value: string; label: string }[];
-      expedientes: { value: string; label: string }[];
-      instituciones: { value: string; label: string }[];
-      dependencias: { value: string; label: string }[];
+      agreements: Option[];
+      resolutions: Option[];
+      files: Option[];
+      institutions: Option[];
+      dependencies: Option[];
     };
   
     const columns = [
       {
         title: "Convenio",
-        accessor: "convenio_nombre",
+        accessor: "agreement_name",
         sortable: true,
         width: '180px',
         align: 'center' as const,
       },
       {
         title: "Fecha de Baja",
-        accessor: "fecha_baja_texto",
+        accessor: "formated_cancellation_date",
         sortable: true,
         width: '180px',
         align: 'center' as const,
       },
       {
         title: "Motivo",
-        accessor: "motivo",
+        accessor: "reason",
         sortable: true,
         width: '180px',
         align: 'center' as const,
@@ -82,27 +80,27 @@ export default function BajasConveniosIndex() {
     const statsList = [
         {
           title: "Ultimas bajas",
-          value: stats.ultimas_bajas.toString(),
+          value: stats.count_last_cancellations.toString(),
           description: "Bajas de convenios en los ultimos 30 días",
           icon: FileText,
-          trend: (stats.total_bajas > 0 ? `${Math.round((stats.ultimas_bajas * 100) / stats.total_bajas)}% del total` : "0% del total"),
+          trend: (stats.count_cancellations > 0 ? `${Math.round((stats.count_last_cancellations * 100) / stats.count_cancellations)}% del total` : "0% del total"),
         },
         {
           title: "Total de Bajas",
-          value: stats.total_bajas.toString(),
+          value: stats.count_cancellations.toString(),
           description: "Bajas de convenios registradas en el sistema",
           icon: Calendar,
-          trend: (stats.total_bajas > 0 ? `${Math.round((stats.total_bajas * 100) / stats.total_bajas)}% del total` : "0% del total"),
+          trend: (stats.count_cancellations > 0 ? `${Math.round((stats.count_cancellations * 100) / stats.count_cancellations)}% del total` : "0% del total"),
         },
         /*{
           title: "Total de Instituciones",
-          value: stats.total_instituciones.toString(),
+          value: stats.count.toString(),
           description: "Instituciones registradas en el sistema",
           icon: Landmark,
-          trend: stats.ultima_fecha ? `Último registro: ${new Intl.DateTimeFormat("es-AR", {
+          trend: stats.last_date ? `Último registro: ${new Intl.DateTimeFormat("es-AR", {
                 dateStyle: "long",
                 timeStyle: "short",
-              }).format(new Date(stats.ultima_fecha))}`
+              }).format(new Date(stats.last_date))}`
             : "Sin registros",
         },
         {
@@ -110,20 +108,19 @@ export default function BajasConveniosIndex() {
           value: stats.total_internacionales.toString(),
           description: "Instituciones con convenios internacionales",
           icon: Globe,
-          trend: (stats.total_instituciones > 0 ? `${Math.round((stats.total_internacionales * 100) / stats.total_instituciones)}% del total` : "0% del total"),
+          trend: (stats.count > 0 ? `${Math.round((stats.total_internacionales * 100) / stats.count)}% del total` : "0% del total"),
         },*/
     ]
 
-    const [bajaConvenioToShow, setBajaConvenioToShow] = useState<BajaConvenioType | null>(null);
-    const [bajaConvenioToDelete, setBajaConvenioToDelete] = useState<BajaConvenioType | null>(null);
+    const [AgreementCancellationToDelete, setAgreementCancellationToDelete] = useState<AgreementCancellation | null>(null);
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState({
-      fecha_desde: '',
-      fecha_hasta: '',
-      convenio_id: '',
-      expediente_id: '',
-      institucion_id: '',
-      dependencia_unsa_id: '',
+      date_since: '',
+      date_until: '',
+      agreement_id: '',
+      file_id: '',
+      institution_id: '',
+      dependency_id: '',
     });
 
     useEffect(() => {
@@ -137,7 +134,7 @@ export default function BajasConveniosIndex() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Bajas de Convenios"/>
-            <ConveniosLayout title='Bajas de Convenios' description='Listado de bajas de convenios registradas en el sistema'>
+            <AgreementsLayout title='Bajas de Convenios' description='Listado de bajas de convenios registradas en el sistema'>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                     {statsList.map((stat, index) => (
                         <StatCard key={index} {...stat} />
@@ -147,13 +144,13 @@ export default function BajasConveniosIndex() {
                 <div className="flex h-full flex-grow flex-col gap-4 rounded-xl p-4 overflow-x-auto">
                   <DataTable
                     title="Listado de Bajas de Convenios"
-                    data={bajasConvenio.data}
-                    totalItems={bajasConvenio.data.length}
+                    data={agreementsCancellation.data}
+                    totalItems={agreementsCancellation.data.length}
                     columns={columns}
-                    currentPage={bajasConvenio.current_page}
-                    totalPages={bajasConvenio.last_page}
+                    currentPage={agreementsCancellation.current_page}
+                    totalPages={agreementsCancellation.last_page}
                     onPageChange={(page) => {
-                      router.get(route('convenios.bajas.index'), {
+                      router.get(route('agreements.cancellations.index'), {
                         page,
                         search: search, // este lo traés de props
                         sort,
@@ -166,7 +163,7 @@ export default function BajasConveniosIndex() {
                     }}
 
                     onSort={(column, direction) => {
-                      router.get(route('convenios.bajas.index'), {
+                      router.get(route('agreements.cancellations.index'), {
                         sort: column,
                         direction,
                         search: search, // también lo pasás
@@ -179,82 +176,21 @@ export default function BajasConveniosIndex() {
                     }}
                     defaultSort={{ column: 'created_at', direction: 'desc' }}
                     onSearch={(value) => {
-                      router.get(route('convenios.bajas.index'), { search: value, ...filters }, {
+                      router.get(route('agreements.cancellations.index'), { search: value, ...filters }, {
                         preserveState: true,
                         replace: true,
                       });
                     }}
-                    onNew={() => router.get(route('convenios.bajas.create'))}
+                    onNew={() => router.get(route('agreements.cancellations.create'))}
                     onOpenFilter={() => setShowFilters(true)}
                     actionLinks={(row) => ({
-                      view: () => setBajaConvenioToShow(row),
-                      edit: route('convenios.bajas.edit', row.id),
-                      delete: () => setBajaConvenioToDelete(row),
+                      view: () => route('agreements.cancellations.edit', row.id),
+                      edit: route('agreements.cancellations.edit', row.id),
+                      delete: () => setAgreementCancellationToDelete(row),
                     })}
                   />
                 </div>
-            </ConveniosLayout>
-
-            <GenericDialog
-              open={!!bajaConvenioToShow}
-              onClose={() => setBajaConvenioToShow(null)}
-              title="Detalles de la baja de convenio"
-              description="Informacion completa de la baja de convenio seleccionada"
-              footer={
-                <Button
-                  className="bg-[#0e3b64] text-white hover:bg-[#3e7fca]"
-                  onClick={() => {
-                    if (!bajaConvenioToShow) return;
-                    router.get(route('convenios.bajas.edit', bajaConvenioToShow.id));
-                  }}
-                >
-                  Editar
-                </Button>
-              }
-            >
-              <SimpleDetailList
-                items={buildDetailItems(bajaConvenioToShow ?? {}, [
-                  {
-                    key: 'convenio_nombre',
-                    label: 'Convenio',
-                    hideIfEmpty: true,
-                    transform: () => bajaConvenioToShow?.convenio_nombre ?? '',
-                  },
-                  {
-                    key: 'fecha_baja',
-                    label: 'Fecha de Baja',
-                    hideIfEmpty: true,
-                    transform: () => bajaConvenioToShow?.fecha_baja_texto ?? '',
-                  },
-                  {
-                    key: 'motivo',
-                    label: 'Motivo',
-                    hideIfEmpty: true,
-                    transform: () => bajaConvenioToShow?.motivo ?? '',
-                  },
-                  {
-                    key: 'resolucion_texto',
-                    label: 'Resolución',
-                    hideIfEmpty: true,
-                    transform: () => bajaConvenioToShow?.resolucion_texto ?? '',
-                  },
-                  {
-                    key: 'expediente_texto',
-                    label: 'Expediente',
-                    hideIfEmpty: true,
-                    transform: () => bajaConvenioToShow?.expediente_texto ?? '',
-                  },
-                  {
-                    key: 'link',
-                    isLink: true,
-                    label: 'Link',
-                    hideIfEmpty: true,
-                    transform: () => bajaConvenioToShow?.resolucion.link ?? '',
-                    hrefTransform: (v) => (v ? String(v) : undefined),
-                  }
-                ])}
-              />
-            </GenericDialog>
+            </AgreementsLayout>
 
             <GenericDialog
               open={showFilters}
@@ -267,7 +203,7 @@ export default function BajasConveniosIndex() {
                     variant="outline"
                     onClick={() => {
                       // Limpia los filtros reiniciando la página sin query params
-                      router.get(route('convenios.bajas.index'));
+                      router.get(route('agreements.cancellations.index'));
                       setShowFilters(false);
                     }}
                   >
@@ -277,13 +213,13 @@ export default function BajasConveniosIndex() {
                   <Button
                     className="bg-[#0e3b64] text-white hover:bg-[#3e7fca]"
                     onClick={() => {
-                      router.get(route('convenios.bajas.index'), {
-                        fecha_desde: filters.fecha_desde,
-                        fecha_hasta: filters.fecha_hasta,
-                        convenio_id: filters.convenio_id,
-                        expediente_id: filters.expediente_id,
-                        institucion_id: filters.institucion_id,
-                        dependencia_unsa_id: filters.dependencia_unsa_id,
+                      router.get(route('agreements.cancellations.index'), {
+                        date_since: filters.date_since,
+                        date_until: filters.date_until,
+                        agreement_id: filters.agreement_id,
+                        file_id: filters.file_id,
+                        institution_id: filters.institution_id,
+                        dependency_id: filters.dependency_id,
                       }, { preserveState: true });
                       setShowFilters(false);
                     }}
@@ -295,33 +231,33 @@ export default function BajasConveniosIndex() {
             >
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="fecha_baja">Fecha de Baja</Label>
+                  <Label htmlFor="date_since">Fecha desde</Label>
                   <Input
-                    id="fecha_baja"
+                    id="date_since"
                     type="date"
-                    value={filters.fecha_desde}
-                    onChange={(e) => setFilters({ ...filters, fecha_desde: e.target.value })}
+                    value={filters.date_since}
+                    onChange={(e) => setFilters({ ...filters, date_since: e.target.value })}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="fecha_baja">Fecha de Baja</Label>
+                  <Label htmlFor="date_until">Fecha hasta</Label>
                   <Input
-                    id="fecha_baja"
+                    id="date_until"
                     type="date"
-                    value={filters.fecha_desde}
-                    onChange={(e) => setFilters({ ...filters, fecha_desde: e.target.value })}
+                    value={filters.date_until}
+                    onChange={(e) => setFilters({ ...filters, date_until: e.target.value })}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="convenio_id">Convenio</Label>
+                  <Label htmlFor="agreement_id">Convenio</Label>
                   <ComboBox
-                    options={convenios.map((c) => ({
+                    options={agreements.map((c) => ({
                       ...c,
                       value: String(c.value),
                     }))}
-                    value={filters.convenio_id ? String(filters.convenio_id) : ""}
+                    value={filters.agreement_id ? String(filters.agreement_id) : ""}
                     onChange={(val) => {
-                      setFilters({ ...filters, convenio_id: val ?? '' })
+                      setFilters({ ...filters, agreement_id: val ?? '' })
                     }}
                     placeholder="Seleccione un convenio"
                     className="w-full"
@@ -329,30 +265,30 @@ export default function BajasConveniosIndex() {
                 </div>
 
                 <div>
-                  <Label htmlFor="expediente_id">Expediente</Label>
+                  <Label htmlFor="file_id">Expediente</Label>
                   <ComboBox
-                    options={expedientes.map((e) => ({
+                    options={files.map((e) => ({
                       ...e,
                       value: String(e.value),
                     }))}
-                    value={filters.expediente_id ? String(filters.expediente_id) : ""}
+                    value={filters.file_id ? String(filters.file_id) : ""}
                     onChange={(val) => {
-                      setFilters({ ...filters, expediente_id: val ?? '' })
+                      setFilters({ ...filters, file_id: val ?? '' })
                     }}
                     placeholder="Seleccione un expediente"
                     className="w-full"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="institucion_id">Institución</Label>
+                  <Label htmlFor="institution_id">Institución</Label>
                   <ComboBox
-                    options={instituciones.map((inst) => ({
+                    options={institutions.map((inst) => ({
                       ...inst,
                       value: String(inst.value),
                     }))}
-                    value={filters.institucion_id ? String(filters.institucion_id) : ""}
+                    value={filters.institution_id ? String(filters.institution_id) : ""}
                     onChange={(val) => {
-                      setFilters({ ...filters, institucion_id: val ?? '' })
+                      setFilters({ ...filters, institution_id: val ?? '' })
                     }}
                     placeholder="Seleccione una institución"
                     className="w-full"
@@ -360,15 +296,15 @@ export default function BajasConveniosIndex() {
                 </div>
 
                 <div>
-                  <Label htmlFor="dependencia_unsa_id">Unidad Académica</Label>
+                  <Label htmlFor="dependency_id">Unidad Académica</Label>
                   <ComboBox
-                    options={dependencias.map((d) => ({
+                    options={dependencies.map((d) => ({
                       ...d,
                       value: String(d.value),
                     }))}
-                    value={filters.dependencia_unsa_id ? String(filters.dependencia_unsa_id) : ""}
+                    value={filters.dependency_id ? String(filters.dependency_id) : ""}
                     onChange={(val) => {
-                      setFilters({ ...filters, dependencia_unsa_id: val ?? '' })
+                      setFilters({ ...filters, dependency_id: val ?? '' })
                     }}
                     placeholder="Seleccione una unidad académica"
                     className="w-full"
@@ -378,18 +314,18 @@ export default function BajasConveniosIndex() {
             </GenericDialog>
 
             <ConfirmDeleteDialog
-              open={!!bajaConvenioToDelete}
+              open={!!AgreementCancellationToDelete}
               onCancel={() => {
-                setBajaConvenioToDelete(null);
+                setAgreementCancellationToDelete(null);
               }}
               onConfirm={() => {
-                if (bajaConvenioToDelete) {
-                  const id = bajaConvenioToDelete.id;
-                  router.delete(route('convenios.bajas.destroy', id));
+                if (AgreementCancellationToDelete) {
+                  const id = AgreementCancellationToDelete.id;
+                  router.delete(route('agreements.cancellations.destroy', id));
                 }
               }}
               title="¿Eliminar baja de convenio?"
-              description={`¿Estás seguro que deseas eliminar la baja de convenio ${bajaConvenioToDelete?.fecha_baja || ''}? Esta acción no se puede deshacer.`}
+              description={`¿Estás seguro que deseas eliminar la baja de convenio ${AgreementCancellationToDelete?.cancellation_date || ''}? Esta acción no se puede deshacer.`}
             />
 
         </AppLayout>

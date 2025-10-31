@@ -1,45 +1,46 @@
-import ConveniosLayout from '@/layouts/admin/agreements/layout';
+import AgreementLayout from '@/layouts/admin/agreements/layout';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, DropdownOption } from '@/types';
+import { BreadcrumbItem, Option } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import BajaConvenioForm from '@/components/forms/agreement-cancellation-form';
-import { type BajaConvenioType } from '@/schemas/baja-convenio-schema';
+import AgreementCancellationForm from '@/components/forms/agreement-cancellation-form';
+import { AgreementCancellation } from '@/types/agreement';
+import { route } from 'ziggy-js';
 
-export default function EditBajaConvenio() {
+export default function EditAgreementCancellation() {
   const { props } = usePage<{ 
-    convenios: DropdownOption[], 
-    resoluciones: DropdownOption[], 
-    convenio_nombre: string,
-    resoluciones_tipos: { value: string; label: string }[],
-    expedientes: { value: string; label: string }[],
-    baja_convenio?: BajaConvenioType
+    agreements: Option[], 
+    resolutions: Option[], 
+    agreement_name: string,
+    resolution_types: Option[],
+    files: Option[],
+    agreement_cancellation?: AgreementCancellation
   }>()
 
-  const { baja_convenio, convenio_nombre } = props;
+  const { agreement_cancellation, agreement_name } = props;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'BAJAS DE CONVENIOS',
-      href: route('convenios.bajas.index'),
+      href: route('agreements.cancellations.index'),
     },
     {
-      title: `Editar: ${convenio_nombre}`,
-      href: route('convenios.bajas.edit', baja_convenio?.id),
+      title: `Editar: ${agreement_name}`,
+      href: route('agreements.cancellations.edit', agreement_cancellation?.id),
     },
   ];
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Editar Baja de Convenio" />
-      <ConveniosLayout title="Editar Baja de Convenio" description="Edita una baja de convenio existente para los convenios.">
+      <AgreementLayout title="Editar Baja de Convenio" description="Edita una baja de convenio existente para los convenios.">
         <div className="p-4">
           <h1 className="text-2xl font-bold mb-4">Editar Baja de Convenio</h1>
-          <BajaConvenioForm
+          <AgreementCancellationForm
             {...props}
-            hideConvenioSelector
+            hideAgreementSelector
           />
         </div>
-      </ConveniosLayout>
+      </AgreementLayout>
     </AppLayout>
   );
 }

@@ -7,12 +7,13 @@ import { ComboBox } from "@/components/ui/combobox"
 import type { ResolutionFormData } from "@/types/resolution"
 import { Option } from "@/types"
 
-type ResolucionSectionProps = {
-  resolucion?: ResolutionFormData | null
-  resoluciones_tipos: Option[]
-  expedientes: Option[]
-  onResolucionChange: (key: keyof ResolutionFormData, value: any) => void
-  onOpenNewExpediente?: () => void
+type ResolutionSectionProps = {
+  resolution?: ResolutionFormData | null
+  resolutions_types: Option[]
+  files: Option[]
+  files_types: Option[]
+  onResolutionChange: (key: keyof ResolutionFormData, value: any) => void
+  onOpenNewFile?: () => void
   errors: Record<string, string>
 }
 
@@ -20,10 +21,10 @@ type ResolucionSectionProps = {
 const pad = (n: string | number, len = 4) => String(n ?? "").replace(/\D/g, "").padStart(len, "0")
 const yy = (y: number) => String(y).slice(-2)
 
-/** Patrones por tipo (filename). El path siempre es https://bo.unsa.edu.ar/{tipo}/R{year}/ */
-function filenameByTipo(tipo: string, year: number, numero: string) {
-  const NUM3 = pad(numero, 3)
-  const NUM4 = pad(numero, 4)
+/** Patrones por type (filename). El path siempre es https://bo.unsa.edu.ar/{type}/R{year}/ */
+function filenameBytype(type: string, year: number, number: string) {
+  const NUM3 = pad(number, 3)
+  const NUM4 = pad(number, 4)
   const map: Record<string, string | ((y: number, num: string) => string)> = {
     // Consejo Superior
     CS: (y, _) => `R-CS-${y}-${NUM3}.pdf`,
@@ -66,122 +67,122 @@ function filenameByTipo(tipo: string, year: number, numero: string) {
     CI: (y, _) => `R-CI-${y}-${NUM4}.pdf`,
   }
 
-  const k = (tipo ?? "").toUpperCase()
+  const k = (type ?? "").toUpperCase()
   const def = (y: number) => `R-${k}-${y}-${NUM4}.pdf`
   const builder = map[k]
-  return typeof builder === "function" ? builder(year, numero) : (builder ?? def(year))
+  return typeof builder === "function" ? builder(year, number) : (builder ?? def(year))
 }
 
-const getLinkFromData = (tipo: string | null, fecha: string | null, numero: string | null) => {
-  if (!tipo || !fecha || !numero) return ""
-  const year = new Date(fecha).getFullYear()
+const getLinkFromData = (type: string | null, date: string | null, number: string | null) => {
+  if (!type || !date || !number) return ""
+  const year = new Date(date).getFullYear()
   const base = "https://bo.unsa.edu.ar"
-  const folder = (tipo ?? "").toLowerCase()
-  const file = filenameByTipo(tipo, year, numero)
+  const folder = (type ?? "").toLowerCase()
+  const file = filenameBytype(type, year, number)
   return `${base}/${folder}/R${year}/${file}`
 }
 
-export function ResolucionSection({
-  resolucion,
-  resoluciones_tipos,
-  expedientes,
-  onResolucionChange,
-  onOpenNewExpediente,
+export function ResolutionSection({
+  resolution,
+  resolutions_types,
+  files,
+  files_types,
+  onResolutionChange,
+  onOpenNewFile,
   errors,
-}: ResolucionSectionProps) {
-  const { getError, errorClass } = useErrors()
+}: ResolutionSectionProps) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    const key = name.split(".")[1] as keyof ResolucionFullType
-    onResolucionChange(key, value)
+    const key = name.split(".")[1] as keyof ResolutionFormData
+    onResolutionChange(key, value)
   }
 
   // Autogeneración reactiva: si el link actual es "auto" (empieza con bo.unsa.edu.ar) lo reemplazamos
   useEffect(() => {
-    if (!resolucion?.tipo || !resolucion?.fecha || !resolucion?.numero) return
-    const autoLink = getLinkFromData(resolucion.tipo, resolucion.fecha, resolucion.numero)
-    const current = resolucion.link ?? ""
+    if (!resolution?.type || !resolution?.date || !resolution?.number) return
+    const autoLink = getLinkFromData(resolution.type, resolution.date, resolution.number)
+    const current = resolution.link ?? ""
     const isAuto = current === "" || current.startsWith("https://bo.unsa.edu.ar/")
     if (!isAuto) return
     if (current === autoLink) return
-    onResolucionChange("link", autoLink)
-  }, [resolucion?.tipo, resolucion?.fecha, resolucion?.numero, resolucion?.link, onResolucionChange])
+    onResolutionChange("link", autoLink)
+  }, [resolution?.type, resolution?.date, resolution?.number, resolution?.link, onResolutionChange])
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-white rounded-xl shadow-sm border">
       <div>
-        <Label htmlFor="resolucion.numero">Número de resolución *</Label>
+        <Label htmlFor="resolution.number">Número de Resolución *</Label>
         <Input
-          name="resolucion.numero"
+          name="resolution.number"
           placeholder="Número de resolución"
-          value={resolucion?.numero ?? ""}
+          value={resolution?.number ?? ""}
           onChange={handleInputChange}
-          className={errorClass("resolucion.numero")}
+          className={errors.resolution?.number ? "border-red-500" : ""}
         />
-        {getError("convenio.resolucion.numero") && <p className="text-red-500 text-sm">{getError("convenio.resolucion.numero")}</p>}
+        {errors.resolution?.number && <p className="text-red-500 text-sm">{errors.resolution.number}</p>}
       </div>
 
       <div>
-        <Label htmlFor="resolucion.fecha">Fecha de resolución *</Label>
+        <Label htmlFor="resolution.date">Fecha de Resolución *</Label>
         <Input
-          name="resolucion.fecha"
+          name="resolution.date"
           type="date"
-          value={resolucion?.fecha ?? ""}
+          value={resolution?.date ?? ""}
           onChange={handleInputChange}
-          className={errorClass("resolucion.fecha")}
+          className={errors.resolution?.date ? "border-red-500" : ""}
         />
-        {getError("resolucion.fecha") && <p className="text-red-500 text-sm">{getError("resolucion.fecha")}</p>}
+        {errors.resolution?.date && <p className="text-red-500 text-sm">{errors.resolution.date}</p>}
       </div>
 
       <div>
-        <Label htmlFor="resolucion.tipo">Tipo de resolución *</Label>
+        <Label htmlFor="resolution.type">Tipo de resolución *</Label>
         <ComboBox
-          options={resoluciones_tipos}
-          value={resolucion?.tipo ?? ""}
-          onChange={(val) => onResolucionChange("tipo", val && val !== "" ? val : null)}
-          placeholder="Seleccione un tipo"
+          options={resolutions_types}
+          value={resolution?.type ?? ""}
+          onChange={(val) => onResolutionChange("type", val && val !== "" ? val : null)}
+          placeholder="Seleccione un type"
           className="w-full"
         />
-        {getError("resolucion.tipo") && <p className="text-red-500 text-sm">{getError("resolucion.tipo")}</p>}
+        {errors.resolution?.type && <p className="text-red-500 text-sm">{errors.resolution.type}</p>}
       </div>
 
       <div>
-        <Label htmlFor="resolucion.expediente_id">Expediente *</Label>
+        <Label htmlFor="resolution.expediente_id">Expediente *</Label>
         <div className="flex gap-2">
           <ComboBox
-            options={expedientes}
-            value={resolucion?.expediente_id != null ? String(resolucion.expediente_id) : null}
+            options={files}
+            value={resolution?.file_id != null ? String(resolution.file_id) : null}
             onChange={(val) => {
-              const expedienteId = val != null && val !== "" ? Number(val) : null
-              onResolucionChange("expediente_id", expedienteId)
+              const fileId = val != null && val !== "" ? Number(val) : null
+              onResolutionChange("file_id", fileId)
             }}
             placeholder="Seleccione un expediente"
             className="flex-1"
           />
-          {onOpenNewExpediente && (
-            <Button type="button" variant="outline" onClick={onOpenNewExpediente}>
+          {onOpenNewFile && (
+            <Button type="button" variant="outline" onClick={onOpenNewFile}>
               Nuevo
             </Button>
           )}
         </div>
-        {getError("resolucion.expediente_id") && (
-          <p className="text-red-500 text-sm">{getError("resolucion.expediente_id")}</p>
+        {errors.resolution?.file_id && (
+          <p className="text-red-500 text-sm">{errors.resolution.file_id}</p>
         )}
       </div>
 
       <div className="md:col-span-2">
-        <Label htmlFor="resolucion.link">Link de la resolución</Label>
+        <Label htmlFor="resolution.link">Link de la resolución</Label>
         <Input
-          name="resolucion.link"
+          name="resolution.link"
           placeholder="https://bo.unsa.edu.ar/..."
-          value={resolucion?.link ?? ""}
+          value={resolution?.link ?? ""}
           onChange={handleInputChange}
-          className={errorClass("resolucion.link")}
+          className={errors.resolution?.link ? "border-red-500" : ""}
         />
-        {getError("resolucion.link") && <p className="text-red-500 text-sm">{getError("resolucion.link")}</p>}
+        {errors.resolution?.link && <p className="text-red-500 text-sm">{errors.resolution.link}</p>}
         <p className="text-xs text-muted-foreground mt-1">
-          Se genera automáticamente (según tipo, fecha y número). Podés editarlo si el documento tiene otra URL.
+          Se genera automáticamente (según type, date y número). Podés editarlo si el documento tiene otra URL.
         </p>
       </div>
     </div>
